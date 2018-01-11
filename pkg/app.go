@@ -4,21 +4,31 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/while-loop/todo/pkg/config"
+	"github.com/while-loop/todo/pkg/publisher"
 	"github.com/while-loop/todo/pkg/tracker"
 	"github.com/while-loop/todo/pkg/vcs"
 )
 
 type App struct {
-	RepoServices  []vcs.RepositoryService
-	IssueTrackers []tracker.Tracker
-	Router        *mux.Router
+	RepoMan      *vcs.Manager
+	TrackerMan   *tracker.Manager
+	PublisherMan *publisher.Manager
+	Router       *mux.Router
+	Config       *config.Config
 }
 
-func New(repoServices []vcs.RepositoryService, issueTrackers []tracker.Tracker) *App {
+func New(config *config.Config) *App {
+	router := mux.NewRouter()
+	rp := vcs.NewManager(config.VcsConfig)
+	rp.ApplyRouter(router)
+
 	return &App{
-		RepoServices:  repoServices,
-		IssueTrackers: issueTrackers,
-		Router:        mux.NewRouter(),
+		RepoMan:      rp,
+		TrackerMan:   tracker.NewManager(config.TrackerConfig),
+		PublisherMan: publisher.NewManager(config.PublisherConfig),
+		Router:       router,
+		Config:       config,
 	}
 }
 

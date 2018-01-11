@@ -1,0 +1,23 @@
+{
+  "vcs": {
+    "github": {
+      "access_token": "my_access_token"
+    },
+    "gitlab": {
+      "access_token": "my_access_token"
+    }
+  },
+  "trackers": {
+    "jira": {
+      "access_token": "my_access_token"
+    },
+    "github": {
+      "access_token": "my_access_token"
+    }
+  },
+  "publishers": {
+    "mock": {
+      "output": "stdout"
+    }
+  }
+}
