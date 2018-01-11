@@ -19,7 +19,6 @@ all: get lint test build ## get && test && build
 
 build: clean lint ## build service binary file
 	@echo "[build] building go binary"
-	@echo ${PACKAGE}/pkg.Version=${VERSION}
 	@go build \
 		-ldflags "-s -w \
 		-X ${PACKAGE}/pkg.Version=${VERSION} \
