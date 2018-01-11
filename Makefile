@@ -19,12 +19,14 @@ all: get lint test build ## get && test && build
 
 build: clean lint ## build service binary file
 	@echo "[build] building go binary"
+	@echo ${PACKAGE}/pkg.Version=${VERSION}
 	@go build \
 		-ldflags "-s -w \
-		-X ${PACKAGE}/version.Version=${VERSION} \
-		-X ${PACKAGE}/version.Commit=${COMMIT} \
-		-X ${PACKAGE}/version.BuildTime=${BUILD_TIME}" \
+		-X ${PACKAGE}/pkg.Version=${VERSION} \
+		-X ${PACKAGE}/pkg.Commit=${COMMIT} \
+		-X ${PACKAGE}/pkg.BuildTime=${BUILD_TIME}" \
 		-o ${GOPATH}/bin/${TARGET} ./cmd/${TARGET}
+	@todod -v
 
 clean: ## remove service bin from $GOPATH/bin
 	@echo "[clean] removing service files"
