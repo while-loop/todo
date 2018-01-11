@@ -12,10 +12,16 @@ import (
 
 var (
 	configFile = flag.String("i", "", "path to config file")
+	v          = flag.Bool("v", false, todo.Name+" version")
 )
 
 func main() {
 	flag.Parse()
+
+	if *v {
+		log.Infof("%s %s %s %s", todo.Name, todo.Version, todo.BuildTime, todo.Commit)
+		return
+	}
 
 	if *configFile == "" {
 		log.Fatal("config file not given")

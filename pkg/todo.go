@@ -6,4 +6,3 @@ var (
 	Commit    = "HEAD"
 	BuildTime = "now"
 )
-
