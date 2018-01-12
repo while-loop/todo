@@ -32,8 +32,8 @@ func New(config *config.Config) *App {
 	}
 }
 
-func (a *App) Handler() http.Handler {
-	return a.Router
+func (a *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	a.Router.ServeHTTP(w, r)
 }
 
 func (a *App) OnPush() error {

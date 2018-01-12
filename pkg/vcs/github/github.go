@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"io/ioutil"
+
 	"github.com/google/go-github/github"
 	"github.com/gorilla/mux"
 	"github.com/while-loop/todo/pkg/log"
@@ -43,10 +45,13 @@ func (s *Service) Name() string {
 }
 
 func (s *Service) Handler() http.Handler {
-	s.router.HandleFunc("/webhook/"+name, s.webhook)
+	s.router.HandleFunc("/webhook/"+name, s.webhook).Methods("POST")
 	return s.router
 }
 
 func (s *Service) webhook(w http.ResponseWriter, r *http.Request) {
-	log.Info(name, r.URL, w, r)
+	log.Info(name, r.URL, r.Header)
+	defer r.Body.Close()
+	bs, err := ioutil.ReadAll(r.Body)
+	log.Info(err, "\n", string(bs))
 }

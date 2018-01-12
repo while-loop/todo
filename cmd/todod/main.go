@@ -5,6 +5,9 @@ import (
 
 	"flag"
 
+	"os"
+
+	"github.com/gorilla/handlers"
 	"github.com/while-loop/todo/pkg"
 	"github.com/while-loop/todo/pkg/config"
 	"github.com/while-loop/todo/pkg/log"
@@ -13,11 +16,11 @@ import (
 var (
 	configFile = flag.String("i", "", "path to config file")
 	v          = flag.Bool("v", false, todo.Name+" version")
+	laddr      = flag.String("laddr", ":8675", "local address to bind to")
 )
 
 func main() {
 	flag.Parse()
-
 	if *v {
 		log.Infof("%s %s %s %s", todo.Name, todo.Version, todo.BuildTime, todo.Commit)
 		return
@@ -38,6 +41,13 @@ func main() {
 	log.Info(app.PublisherMan.Publishers())
 	log.Info(app.TrackerMan.Trackers())
 
-	log.Info("Running on :8080")
-	log.Fatal(http.ListenAndServe(":8080", app.Handler()))
+	log.Info("Running on " + *laddr)
+	log.Fatal(http.ListenAndServe(*laddr, wrapAppHandler(app)))
+}
+
+func wrapAppHandler(handler http.Handler) http.Handler {
+	h := handlers.LoggingHandler(os.Stdout, handler)
+	h = handlers.CORS()(h)
+	h = handlers.RecoveryHandler()(h)
+	return h
 }

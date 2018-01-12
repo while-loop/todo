@@ -44,7 +44,7 @@ func (m *Manager) Trackers() map[string]Tracker {
 	return m.trackers
 }
 
-func (m *Manager) initPublishers() {
+func (m *Manager) initTrackers() {
 	conf := m.config
 
 	if conf.Github != nil {
