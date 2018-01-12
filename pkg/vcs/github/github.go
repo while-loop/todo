@@ -6,8 +6,6 @@ import (
 
 	"crypto/hmac"
 	"crypto/sha1"
-	"crypto/sha256"
-	"crypto/sha512"
 	"encoding/hex"
 	"github.com/google/go-github/github"
 	"github.com/gorilla/mux"
