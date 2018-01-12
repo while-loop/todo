@@ -1,7 +1,8 @@
 {
   "vcs": {
     "github": {
-      "access_token": "my_access_token"
+      "access_token": "my_access_token",
+      "webhook_secret": "webhook_secret"
     },
     "gitlab": {
       "access_token": "my_access_token"

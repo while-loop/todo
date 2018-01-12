@@ -6,7 +6,8 @@ type VcsConfig struct {
 }
 
 type GithubConfig struct {
-	AccessToken string `json:"access_token" yaml:"access_token"`
+	AccessToken   string `json:"access_token" yaml:"access_token"`
+	WebhookSecret string `json:"webhook_secret" yaml:"webhook_secret"`
 }
 
 type GitlabConfig struct {

@@ -22,6 +22,8 @@
 
 .idea
 
+myconfig.yml
+
 # Mongo Explorer plugin:
 .idea/mongoSettings.xml
 
