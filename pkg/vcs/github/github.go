@@ -16,23 +16,31 @@ import (
 
 const (
 	name = "github"
+	issues = "issues"
+	push = "push"
+	installation = "installation"
 )
 
 type Service struct {
-	router   *mux.Router
-	ghClient *github.Client
-	issueCh  <-chan tracker.Issue
+	router        *mux.Router
+	ghClient      *github.Client
+	issueCh       <-chan tracker.Issue
+	eventHandlers map[string]http.HandlerFunc
 }
 
 func NewService(config *config.GithubConfig, issueChan <-chan tracker.Issue) *Service {
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.AccessToken})
 	oauthClient := oauth2.NewClient(context.Background(), ts)
 	s := &Service{
-		issueCh:  issueChan,
-		router:   mux.NewRouter(),
-		ghClient: github.NewClient(oauthClient),
+		issueCh:       issueChan,
+		router:        mux.NewRouter(),
+		ghClient:      github.NewClient(oauthClient),
+		eventHandlers: map[string]http.HandlerFunc{},
 	}
 
+	s.eventHandlers[issues] = s.handleIssue
+	s.eventHandlers[installation] = s.handleInstallation
+	s.eventHandlers[push] = s.handlePush
 	return s
 }
 
@@ -51,7 +59,14 @@ func (s *Service) Handler() http.Handler {
 
 func (s *Service) webhook(w http.ResponseWriter, r *http.Request) {
 	log.Info(name, r.URL, r.Header)
-	defer r.Body.Close()
 	bs, err := ioutil.ReadAll(r.Body)
 	log.Info(err, "\n", string(bs))
+	event := r.Header.Get("X-GitHub-Event")
+
+	if h, exists := s.eventHandlers[event]; exists {
+		h(w, r)
+	} else {
+		log.Errorf("Unknown event called: %s", event)
+		w.WriteHeader(http.StatusNotFound)
+	}
 }
