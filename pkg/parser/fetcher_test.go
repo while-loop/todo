@@ -51,6 +51,6 @@ func TestServerDown(t *testing.T) {
 	u := "https://fakegithuburlTestServerDown.com/who"
 
 	rc, err := DownloadFile(&http.Client{Timeout: 5 * time.Second}, u)
-	a.Contains(err.Error(), "connection refused")
+	a.Contains(err.Error(), "failed to download file to parse")
 	a.Nil(rc)
 }
