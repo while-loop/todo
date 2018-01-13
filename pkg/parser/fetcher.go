@@ -2,9 +2,9 @@ package parser
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"io"
 	"net/http"
-	"github.com/pkg/errors"
 )
 
 // DownloadFile downloads repository files. Http clients should have access

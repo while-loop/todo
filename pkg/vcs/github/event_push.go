@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/luci/go-render/render"
 	"github.com/while-loop/todo/pkg/log"
-	"github.com/while-loop/todo/pkg/parser"
 	"net/http"
 	"strings"
 	"time"
@@ -36,7 +35,7 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// foreach file, get all todos
-	todos := parser.GetTodos(suspects...)
+	todos := s.parser.GetTodos(suspects...)
 	fmt.Println(suspects)
 
 	// send todos to issuechan (tracker will handle reducing and filtering)

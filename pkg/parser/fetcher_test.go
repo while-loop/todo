@@ -1,11 +1,11 @@
 package parser
 
 import (
-	"testing"
 	"github.com/stretchr/testify/require"
-	"net/http"
-	"time"
 	"io/ioutil"
+	"net/http"
+	"testing"
+	"time"
 )
 
 func TestGetGithubFile(t *testing.T) {
@@ -45,7 +45,6 @@ func TestFileNotFound(t *testing.T) {
 	a.Contains(err.Error(), "status code 404")
 	a.Nil(rc)
 }
-
 
 func TestServerDown(t *testing.T) {
 	a := require.New(t)
