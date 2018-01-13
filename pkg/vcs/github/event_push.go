@@ -30,6 +30,10 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 	// get changed files list
 	for _, commit := range event.Commits {
 		for _, fPath := range append(commit.Modified, commit.Added...) {
+			if event.Repository.FullName == "while-loop/todo" && strings.HasSuffix(fPath, "_test.go"){
+				// don't parse any test todos as issues to generate
+				continue
+			}
 			suspects = append(suspects, contentUrl(event.Repository.FullName, commit.ID, fPath))
 		}
 	}
