@@ -15,7 +15,7 @@ import (
 
 const (
 	cmtToken = `{comment_token}`
-	cmtRegex = `(?i)^\s*` + cmtToken + `.*todo(\((.*)\))?\s*(.*)$`
+	cmtRegex = `(?i)^\s*` + cmtToken + `.*todo(\((.*)\):")?\s*(.*)$`
 )
 
 var (
@@ -33,7 +33,7 @@ func init() {
 func ParseFile(fileName string, file io.ReadCloser) ([]tracker.Issue, error) {
 	defer file.Close()
 	issues := make([]tracker.Issue, 0)
-	ext := filepath.Ext(fileName)
+	ext := strings.TrimLeft(filepath.Ext(fileName), ".")
 	if ext == "" {
 		log.Errorf("failed to get file ext for %s", fileName)
 		return nil, fmt.Errorf("unknown file ext: %s", ext)
@@ -66,12 +66,13 @@ func ParseFile(fileName string, file io.ReadCloser) ([]tracker.Issue, error) {
 
 func commentRegexes(ext string) *regexp.Regexp {
 	idx := sort.SearchStrings(slashLangs, ext)
-	if idx >= 0 {
+	fmt.Println(idx, len(slashLangs), slashLangs)
+	if idx < len(slashLangs) && slashLangs[idx] == ext {
 		return slashRegex
 	}
 
 	idx = sort.SearchStrings(hashLangs, ext)
-	if idx >= 0 {
+	if idx < len(hashLangs) && hashLangs[idx] == ext {
 		return hashRegex
 	}
 

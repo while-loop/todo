@@ -92,7 +92,7 @@ func worker(wg *sync.WaitGroup, urlChan <-chan string, results chan<- tracker.Is
 			// don't return because we could have recvd partial issues w/ an error
 		}
 
-		if iss != nil && len(iss) > 0 {
+		if len(iss) > 0 {
 			for _, is := range iss {
 				results <- is
 			}

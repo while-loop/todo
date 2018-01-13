@@ -32,6 +32,7 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 		for _, fPath := range append(commit.Modified, commit.Added...) {
 			if event.Repository.FullName == "while-loop/todo" && strings.HasSuffix(fPath, "_test.go"){
 				// don't parse any test todos as issues to generate
+				// todo add "exclude" (array) to each vcs config struct. match regex
 				continue
 			}
 			suspects = append(suspects, contentUrl(event.Repository.FullName, commit.ID, fPath))
