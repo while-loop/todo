@@ -18,8 +18,10 @@ type Issue struct {
 	Description string
 	Assignee    string
 	Author      string
-	Mentions    string
+	Mentions    []string
 	Labels      []string
+	File        string
+	Line        int
 }
 
 func (i *Issue) String() string {

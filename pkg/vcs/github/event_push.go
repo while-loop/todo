@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/luci/go-render/render"
 	"github.com/while-loop/todo/pkg/log"
-	"github.com/while-loop/todo/pkg/parser"
 	"net/http"
 	"strings"
 	"time"
@@ -31,15 +30,20 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 	// get changed files list
 	for _, commit := range event.Commits {
 		for _, fPath := range append(commit.Modified, commit.Added...) {
+			if event.Repository.FullName == "while-loop/todo" && strings.HasSuffix(fPath, "_test.go") {
+				// don't parse any test todos as issues to generate !todo
+				// todo add "exclude" (array) to vcs config struct. match regex
+				continue
+			}
 			suspects = append(suspects, contentUrl(event.Repository.FullName, commit.ID, fPath))
 		}
 	}
 
 	// foreach file, get all todos
-	todos := parser.GetTodos(suspects...)
+	todos := s.parser.GetTodos(suspects...)
 	fmt.Println(suspects)
 
-	// send todos to issuechan (tracker will handle reducing and filtering)
+	// send todos to issuechan (tracker will handle reducing and filtering) !todo
 	log.Infof("found %d todos in github push %s", len(todos), event.HeadCommit.URL)
 	go func() {
 		for _, t := range todos {

@@ -10,6 +10,7 @@ import (
 	"github.com/google/go-github/github"
 	"github.com/gorilla/mux"
 	"github.com/while-loop/todo/pkg/log"
+	"github.com/while-loop/todo/pkg/parser"
 	"github.com/while-loop/todo/pkg/tracker"
 	"github.com/while-loop/todo/pkg/vcs/config"
 	"golang.org/x/oauth2"
@@ -31,6 +32,7 @@ type Service struct {
 	issueCh       chan<- tracker.Issue
 	eventHandlers map[string]http.HandlerFunc
 	config        *config.GithubConfig
+	parser        parser.TodoParser
 }
 
 func NewService(config *config.GithubConfig, issueChan chan<- tracker.Issue) *Service {
@@ -42,6 +44,7 @@ func NewService(config *config.GithubConfig, issueChan chan<- tracker.Issue) *Se
 		ghClient:      github.NewClient(oauthClient),
 		eventHandlers: map[string]http.HandlerFunc{},
 		config:        config,
+		parser:        parser.New(), // todo(while-loop) add parser as param
 	}
 
 	s.eventHandlers[issues] = s.handleIssue
