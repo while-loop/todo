@@ -45,20 +45,58 @@ func TestTODOs(t *testing.T) {
 		comment string
 		rexp    *regexp.Regexp
 		found   bool
-		iss     tracker.Issue
+		is      tracker.Issue
 	}{
 		{"// todo hello world", slashRegex, true, tracker.Issue{Title: "hello world"}},
 		{"line of code", slashRegex, false, e},
-		{"# todo(snake) impl python", hashRegex, true, tracker.Issue{Title: "impl python", Assignee: "snake"}},
-		{`// fmt.Println("uh oh") todo(snake) eol comment`, slashRegex, true, tracker.Issue{Title: "eol comment", Assignee: "snake"}},
+		{"# todo(snake): impl python", hashRegex, true, tracker.Issue{Title: "impl python", Assignee: "snake"}},
+		{`// fmt.Println("uh oh") todo(snake): eol comment`, slashRegex, true, tracker.Issue{Title: "eol comment", Assignee: "snake"}},
+		{"// todo(while-loop): @dev1 finish tests +test +api", slashRegex, true, tracker.Issue{
+			Title:    "finish tests",
+			Labels:   []string{"test", "api"},
+			Mentions: []string{"@dev1"},
+			Assignee: "while-loop",
+		}},
 	}
 
 	for idx, tt := range tcs {
 		t.Run(strconv.Itoa(idx), func(inner *testing.T) {
-			_, found := parseLine(tt.rexp, tt.comment)
+			is, found := parseLine(tt.rexp, tt.comment)
 
 			require.Equal(inner, found, tt.found)
-			// require.Equal(inner, iss, tt.iss) todo
+			require.Equal(inner, is, tt.is)
+		})
+	}
+}
+
+func TestMentions(t *testing.T) {
+	tcs := []struct {
+		cmt      string
+		mentions []string
+	}{
+		{`// todo(while-loop): find all @user1 users in db  @wh3n7hi5-ends-i_win`, []string{"@user1", "@wh3n7hi5-ends-i_win"}},
+		{`// var 3 int todo find all`, nil},
+	}
+
+	for idx, tt := range tcs {
+		t.Run(strconv.Itoa(idx), func(t *testing.T) {
+			require.Equal(t, tt.mentions, mentionsRegex.FindAllString(tt.cmt, -1))
+		})
+	}
+}
+
+func TestLabels(t *testing.T) {
+	tcs := []struct {
+		cmt    string
+		labels []string
+	}{
+		{`// todo(while-loop): find all +users users in db +api/users +wh3n7hi5-ends-i_win`, []string{"users", "api/users", "wh3n7hi5-ends-i_win"}},
+		{`// var 3 int todo find all`, nil},
+	}
+
+	for idx, tt := range tcs {
+		t.Run(strconv.Itoa(idx), func(t *testing.T) {
+			require.Equal(t, tt.labels, parseLabels(tt.cmt))
 		})
 	}
 }

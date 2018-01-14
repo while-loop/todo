@@ -13,16 +13,22 @@ import (
 	"strings"
 )
 
+type cmtKind string
+
 const (
-	cmtToken = `{comment_token}`
-	cmtRegex = `(?i)^\s*` + cmtToken + `.*todo(\((.*)\):")?\s*(.*)$`
+	cmtToken         = `{comment_token}`
+	cmtRegex         = `(?i)^\s*` + cmtToken + `.*todo(\((?P<assignee>.*)\):)?\s*(.*)$`
+	hash     cmtKind = "#"
+	slash            = "//"
 )
 
 var (
-	slashRegex = regexp.MustCompile(strings.Replace(cmtRegex, cmtToken, `//`, 1))
-	hashRegex  = regexp.MustCompile(strings.Replace(cmtRegex, cmtToken, `#`, 1))
-	slashLangs = []string{"go", "java", "c", "cpp", "h", "hpp"}
-	hashLangs  = []string{"py", "sh", "bash", "yml", "yaml"}
+	slashRegex    = regexp.MustCompile(strings.Replace(cmtRegex, cmtToken, string(slash), 1))
+	hashRegex     = regexp.MustCompile(strings.Replace(cmtRegex, cmtToken, string(hash), 1))
+	mentionsRegex = regexp.MustCompile(`(@[^\s]+)`)
+	labelsRegex   = regexp.MustCompile(`\+([^\s]+)`)
+	slashLangs    = []string{"go", "java", "c", "cpp", "h", "hpp"}
+	hashLangs     = []string{"py", "sh", "bash", "yml", "yaml"}
 )
 
 func init() {
@@ -48,12 +54,22 @@ func ParseFile(fileName string, file io.ReadCloser) ([]tracker.Issue, error) {
 	scan := bufio.NewScanner(file)
 	scan.Split(bufio.ScanLines)
 
+	lineNum := 0 // set as 0 so 1st iteration is 1. increment is at beginning to accommodate for continues
 	for scan.Scan() {
+		lineNum++
 		line := scan.Text()
-		iss, found := parseLine(rexp, line)
+
+		// todo(while-loop) add ignore keyword to yml config (ParseFile will be a todoParser func)
+		if strings.Contains(line, "!todo") {
+			continue
+		}
+
+		is, found := parseLine(rexp, line)
 		if found {
-			log.Debugf("found issue: %s\n%s", line, iss.String())
-			issues = append(issues, iss)
+			is.File = fileName
+			is.Line = lineNum
+			log.Debugf("found issue: %s\n%s", line, is.String())
+			issues = append(issues, is)
 		}
 	}
 
@@ -66,7 +82,6 @@ func ParseFile(fileName string, file io.ReadCloser) ([]tracker.Issue, error) {
 
 func commentRegexes(ext string) *regexp.Regexp {
 	idx := sort.SearchStrings(slashLangs, ext)
-	fmt.Println(idx, len(slashLangs), slashLangs)
 	if idx < len(slashLangs) && slashLangs[idx] == ext {
 		return slashRegex
 	}
@@ -80,15 +95,67 @@ func commentRegexes(ext string) *regexp.Regexp {
 }
 
 func parseLine(rexp *regexp.Regexp, line string) (tracker.Issue, bool) {
-	var i tracker.Issue
 
 	finds := rexp.FindStringSubmatch(line)
 	if len(finds) <= 0 {
-		return i, false
+		return tracker.Issue{}, false
 	}
 
-	log.Info(finds)
-	i.Title = "temp"
+	i := tracker.Issue{
+		Mentions:    mentionsRegex.FindAllString(line, -1),
+		Labels:      parseLabels(line),
+		File:        "",
+		Line:        0,
+		ID:          "",
+		Title:       "",
+		Assignee:    "",
+		Author:      "",
+		Description: "",
+	}
+
+	i.Title = createTitle(line, regexKind(rexp), i.Mentions, i.Labels)
+
+	for idx, name := range rexp.SubexpNames() {
+		if name == "assignee" {
+			i.Assignee = finds[idx]
+		}
+	}
 
 	return i, true
+}
+
+func createTitle(line string, kind cmtKind, mentions, labels []string) string {
+	line = regexp.MustCompile(`(?i).*`+string(kind)+`.*todo(\((.*)\):)?\s*`).ReplaceAllString(line, "")
+
+	for _, m := range mentions {
+		line = regexp.MustCompile(`\s*`+m+`\s*`).ReplaceAllString(line, "")
+	}
+
+	for _, l := range labels {
+		line = regexp.MustCompile(`\s*\+`+l+`\s*`).ReplaceAllString(line, "")
+	}
+	return line
+}
+
+func parseLabels(line string) []string {
+	var labels []string
+
+	for _, groups := range labelsRegex.FindAllStringSubmatch(line, -1) {
+		if len(groups) < 2 {
+			log.Warn("only found 1 group in label regex", groups)
+			continue
+		}
+
+		labels = append(labels, groups[1])
+	}
+
+	return labels
+}
+
+func regexKind(rexp *regexp.Regexp) cmtKind {
+	if strings.Contains(rexp.String(), string(hash)) {
+		return hash
+	} else {
+		return slash
+	}
 }

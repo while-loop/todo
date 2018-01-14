@@ -30,9 +30,9 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 	// get changed files list
 	for _, commit := range event.Commits {
 		for _, fPath := range append(commit.Modified, commit.Added...) {
-			if event.Repository.FullName == "while-loop/todo" && strings.HasSuffix(fPath, "_test.go"){
-				// don't parse any test todos as issues to generate
-				// todo add "exclude" (array) to each vcs config struct. match regex
+			if event.Repository.FullName == "while-loop/todo" && strings.HasSuffix(fPath, "_test.go") {
+				// don't parse any test todos as issues to generate !todo
+				// todo add "exclude" (array) to vcs config struct. match regex
 				continue
 			}
 			suspects = append(suspects, contentUrl(event.Repository.FullName, commit.ID, fPath))
@@ -43,7 +43,7 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 	todos := s.parser.GetTodos(suspects...)
 	fmt.Println(suspects)
 
-	// send todos to issuechan (tracker will handle reducing and filtering)
+	// send todos to issuechan (tracker will handle reducing and filtering) !todo
 	log.Infof("found %d todos in github push %s", len(todos), event.HeadCommit.URL)
 	go func() {
 		for _, t := range todos {

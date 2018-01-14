@@ -4,7 +4,6 @@ import (
 	"github.com/while-loop/todo/pkg/log"
 	"github.com/while-loop/todo/pkg/tracker"
 	"net/http"
-	"path/filepath"
 	"sync"
 	"time"
 )
@@ -85,7 +84,7 @@ func worker(wg *sync.WaitGroup, urlChan <-chan string, results chan<- tracker.Is
 		}
 
 		log.Debug("working parsing file")
-		iss, err := ParseFile(filepath.Base(u), rc)
+		iss, err := ParseFile(u, rc)
 		rc.Close()
 		if err != nil {
 			log.Error("worker failed to parse file", err)
