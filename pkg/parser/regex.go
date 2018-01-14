@@ -13,18 +13,16 @@ import (
 	"strings"
 )
 
-type cmtKind string
-
 const (
-	cmtToken         = `{comment_token}`
-	cmtRegex         = `(?i)^\s*` + cmtToken + `.*todo(\((?P<assignee>.*)\):)?[\s|$]\s*(.*)$`
-	hash     cmtKind = "#"
-	slash            = "//"
+	cmtToken = `{comment_token}`
+	cmtRegex = `(?i)^\s*` + cmtToken + `.*todo(\((?P<assignee>.*)\):)?[\s|$]\s*(?P<title>.*)$`
+	slash    = `//`
+	hash     = `#`
 )
 
 var (
-	slashRegex    = regexp.MustCompile(strings.Replace(cmtRegex, cmtToken, string(slash), 1))
-	hashRegex     = regexp.MustCompile(strings.Replace(cmtRegex, cmtToken, string(hash), 1))
+	slashRegex    = regexp.MustCompile(strings.Replace(cmtRegex, cmtToken, slash, 1))
+	hashRegex     = regexp.MustCompile(strings.Replace(cmtRegex, cmtToken, hash, 1))
 	mentionsRegex = regexp.MustCompile(`(@[^\s]+)`)
 	labelsRegex   = regexp.MustCompile(`\+([^\s]+)`)
 	slashLangs    = []string{"go", "java", "c", "cpp", "h", "hpp"}
@@ -113,20 +111,20 @@ func parseLine(rexp *regexp.Regexp, line string) (tracker.Issue, bool) {
 		Description: "",
 	}
 
-	i.Title = createTitle(line, regexKind(rexp), i.Mentions, i.Labels)
-
 	for idx, name := range rexp.SubexpNames() {
 		if name == "assignee" {
 			i.Assignee = finds[idx]
 		}
+		if name == "title" {
+			i.Title = finds[idx]
+		}
 	}
 
+	i.Title = filterTitle(i.Title, i.Mentions, i.Labels)
 	return i, true
 }
 
-func createTitle(line string, kind cmtKind, mentions, labels []string) string {
-	line = regexp.MustCompile(`(?i).*`+string(kind)+`.*todo(\((.*)\):)?[\s|$]\s*`).ReplaceAllString(line, "")
-
+func filterTitle(line string, mentions, labels []string) string {
 	for _, m := range mentions {
 		line = regexp.MustCompile(`\s*`+m+`\s*`).ReplaceAllString(line, "")
 	}
@@ -150,12 +148,4 @@ func parseLabels(line string) []string {
 	}
 
 	return labels
-}
-
-func regexKind(rexp *regexp.Regexp) cmtKind {
-	if strings.Contains(rexp.String(), string(hash)) {
-		return hash
-	} else {
-		return slash
-	}
 }
