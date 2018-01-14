@@ -8,7 +8,7 @@ import (
 	"reflect"
 )
 
-var fileName = `test/etcdTodos.java`
+var fileName = `test/etcdTodos.test`
 
 func main() {
 	// this is a list of TODOs found in the root directory of https://github.com/coreos/etcd

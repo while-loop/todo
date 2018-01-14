@@ -25,7 +25,7 @@ var (
 	hashRegex     = regexp.MustCompile(strings.Replace(cmtRegex, cmtToken, hash, 1))
 	mentionsRegex = regexp.MustCompile(`(@[^\s]+)`)
 	labelsRegex   = regexp.MustCompile(`\+([^\s]+)`)
-	slashLangs    = []string{"go", "java", "c", "cpp", "h", "hpp"}
+	slashLangs    = []string{"go", "java", "c", "cpp", "h", "hpp", "test"}
 	hashLangs     = []string{"py", "sh", "bash", "yml", "yaml"}
 )
 
