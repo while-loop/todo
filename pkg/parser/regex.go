@@ -17,7 +17,7 @@ type cmtKind string
 
 const (
 	cmtToken         = `{comment_token}`
-	cmtRegex         = `(?i)^\s*` + cmtToken + `.*todo(\((?P<assignee>.*)\):)?\s*(.*)$`
+	cmtRegex         = `(?i)^\s*` + cmtToken + `.*todo(\((?P<assignee>.*)\):)?[\s|$]\s*(.*)$`
 	hash     cmtKind = "#"
 	slash            = "//"
 )
@@ -59,7 +59,7 @@ func ParseFile(fileName string, file io.ReadCloser) ([]tracker.Issue, error) {
 		lineNum++
 		line := scan.Text()
 
-		// todo(while-loop) add ignore keyword to yml config (ParseFile will be a todoParser func)
+		// todo(while-loop): add ignore keyword to yml config (ParseFile will be a todoParser func)
 		if strings.Contains(line, "!todo") {
 			continue
 		}
@@ -125,7 +125,7 @@ func parseLine(rexp *regexp.Regexp, line string) (tracker.Issue, bool) {
 }
 
 func createTitle(line string, kind cmtKind, mentions, labels []string) string {
-	line = regexp.MustCompile(`(?i).*`+string(kind)+`.*todo(\((.*)\):)?\s*`).ReplaceAllString(line, "")
+	line = regexp.MustCompile(`(?i).*`+string(kind)+`.*todo(\((.*)\):)?[\s|$]\s*`).ReplaceAllString(line, "")
 
 	for _, m := range mentions {
 		line = regexp.MustCompile(`\s*`+m+`\s*`).ReplaceAllString(line, "")
