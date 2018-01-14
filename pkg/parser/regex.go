@@ -15,7 +15,7 @@ import (
 
 const (
 	cmtToken = `{comment_token}`
-	cmtRegex = `(?i)^\s*` + cmtToken + `.*todo(\((?P<assignee>.*)\):)?[\s|$]\s*(?P<title>.*)$`
+	cmtRegex = `(?i)^\s*` + cmtToken + `.*todo:?\s*(\((?P<assignee>.*)\):?)?[\s|$]\s*(?P<title>.*)$`
 	slash    = `//`
 	hash     = `#`
 )
@@ -66,8 +66,10 @@ func ParseFile(fileName string, file io.ReadCloser) ([]tracker.Issue, error) {
 		if found {
 			is.File = fileName
 			is.Line = lineNum
-			log.Debugf("found issue: %s\n%s", line, is.String())
+			//log.Debugf("found issue: %s\n%s", line, is.String())
 			issues = append(issues, is)
+		} else {
+			log.Debug(line)
 		}
 	}
 

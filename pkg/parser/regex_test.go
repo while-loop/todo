@@ -46,7 +46,10 @@ func TestTODOs(t *testing.T) {
 	}{
 		{"// todo hello world", slashRegex, tracker.Issue{Title: "hello world"}},
 		{"line of code", slashRegex, e},
+		{`// using the command "grep -nri -E "^.*//\s*todo.*" > etcdTodos.txt"`, slashRegex, e},
+		{"// this is a list of TODOs found in the root directory of https://github.com/coreos/etcd", slashRegex, e},
 		{"# todo(snake): impl python", hashRegex, tracker.Issue{Title: "impl python", Assignee: "snake"}},
+		{"# todo(snake) impl python", hashRegex, tracker.Issue{Title: "impl python", Assignee: "snake"}},
 		{`// fmt.Println("uh oh") todo(snake): eol comment`, slashRegex, tracker.Issue{Title: "eol comment", Assignee: "snake"}},
 		{"// todo(while-loop): @dev1 finish tests +test +api", slashRegex, tracker.Issue{ // 4
 			Title:    "finish tests",
