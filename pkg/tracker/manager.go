@@ -56,15 +56,15 @@ func (m *Manager) loop() {
 			log.Info(toCreate)
 			log.Infof("need to create %d issues", len(toCreate))
 			ctx, _ = context.WithTimeout(context.Background(), 5*time.Second)
-			for _, c := range toCreate {
-				log.Info("tocreat: ", c)
-				go func() {
-					if is, err := tr.CreateIssue(ctx, c); err != nil {
+			for _, cr := range toCreate {
+				go func(i *issue.Issue) {
+					log.Info("tocreat: ", i)
+					if is, err := tr.CreateIssue(ctx, i); err != nil {
 						log.Error(err)
 					} else {
 						log.Infof("Created issue: %s/%s/%s", is.Owner, is.Repo, is.ID)
 					}
-				}()
+				}(cr)
 			}
 		}
 	}
