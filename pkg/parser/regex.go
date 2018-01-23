@@ -63,7 +63,7 @@ func ParseFile(fileName string, file io.ReadCloser) ([]*issue.Issue, error) {
 			continue
 		}
 
-		// todo treat subsequent comment lines as description
+		// todo(while-loop): treat subsequent comment lines as description
 		is, found := parseLine(rexp, line)
 		if found {
 			is.File = fileName

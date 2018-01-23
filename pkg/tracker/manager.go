@@ -55,7 +55,7 @@ func (m *Manager) loop() {
 			log.Info(iss)
 			log.Info(toCreate)
 			log.Infof("need to create %d issues", len(toCreate))
-			ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
+			ctx, _ = context.WithTimeout(context.Background(), 5*time.Second)
 			for _, c := range toCreate {
 				log.Info("tocreat: ", c)
 				go func() {
@@ -66,7 +66,6 @@ func (m *Manager) loop() {
 					}
 				}()
 			}
-			cancel()
 		}
 	}
 }
