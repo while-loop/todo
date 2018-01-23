@@ -14,6 +14,7 @@ type Issue struct {
 	Line        int
 	Owner       string
 	Repo        string
+	Commit      string
 }
 
 func (i *Issue) String() string {

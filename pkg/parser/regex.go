@@ -35,9 +35,9 @@ func init() {
 	sort.Strings(hashLangs)
 }
 
-func ParseFile(fileName string, file io.ReadCloser) ([]issue.Issue, error) {
+func ParseFile(fileName string, file io.ReadCloser) ([]*issue.Issue, error) {
 	defer file.Close()
-	issues := make([]issue.Issue, 0)
+	issues := make([]*issue.Issue, 0)
 	ext := strings.TrimLeft(filepath.Ext(fileName), ".")
 	if ext == "" {
 		log.Errorf("failed to get file ext for %s", fileName)
@@ -63,11 +63,12 @@ func ParseFile(fileName string, file io.ReadCloser) ([]issue.Issue, error) {
 			continue
 		}
 
+		// todo treat subsequent comment lines as description
 		is, found := parseLine(rexp, line)
 		if found {
 			is.File = fileName
 			is.Line = lineNum
-			//log.Debugf("found issue: %s\n%s", line, is.String())
+			is.Commit = "master"
 			issues = append(issues, is)
 		}
 	}
@@ -93,11 +94,11 @@ func commentRegexes(ext string) *regexp.Regexp {
 	return nil
 }
 
-func parseLine(rexp *regexp.Regexp, line string) (issue.Issue, bool) {
+func parseLine(rexp *regexp.Regexp, line string) (*issue.Issue, bool) {
 
 	finds := rexp.FindStringSubmatch(line)
 	if len(finds) <= 0 {
-		return issue.Issue{}, false
+		return nil, false
 	}
 
 	ms := mentionsRegex.FindAllString(line, -1)
@@ -105,7 +106,7 @@ func parseLine(rexp *regexp.Regexp, line string) (issue.Issue, bool) {
 		ms = []string{}
 	}
 
-	i := issue.Issue{
+	i := &issue.Issue{
 		Mentions:    ms,
 		Labels:      parseLabels(line),
 		File:        "",

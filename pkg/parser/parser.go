@@ -31,7 +31,7 @@ func New() TodoParser {
 func (p *todoParser) GetTodos(owner, repo string, urls ...string) []*issue.Issue {
 
 	jobs := make(chan string, 100)
-	results := make(chan issue.Issue, 100)
+	results := make(chan *issue.Issue, 100)
 	finished := make(chan struct{})
 
 	wg := &sync.WaitGroup{}
@@ -56,7 +56,7 @@ func (p *todoParser) GetTodos(owner, repo string, urls ...string) []*issue.Issue
 		for is := range results {
 			is.Owner = owner
 			is.Repo = repo
-			issues = append(issues, &is)
+			issues = append(issues, is)
 		}
 		finished <- struct{}{} // let the main thread know we're done collecting issues
 	}()
@@ -77,7 +77,7 @@ func (p *todoParser) GetTodos(owner, repo string, urls ...string) []*issue.Issue
 }
 
 // worker downloads and parses a file given a url
-func worker(wg *sync.WaitGroup, urlChan <-chan string, results chan<- issue.Issue) {
+func worker(wg *sync.WaitGroup, urlChan <-chan string, results chan<- *issue.Issue) {
 	for u := range urlChan {
 		log.Info("worker recvd ", u)
 		rc, err := DownloadFile(client, u)
