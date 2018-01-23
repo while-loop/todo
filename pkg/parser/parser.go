@@ -1,11 +1,12 @@
 package parser
 
 import (
-	"github.com/while-loop/todo/pkg/log"
-	"github.com/while-loop/todo/pkg/tracker"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/while-loop/todo/pkg/issue"
+	"github.com/while-loop/todo/pkg/log"
 )
 
 const (
@@ -17,7 +18,7 @@ var (
 )
 
 type TodoParser interface {
-	GetTodos(urls ...string) []tracker.Issue
+	GetTodos(urls ...string) []issue.Issue
 }
 
 type todoParser struct {
@@ -27,10 +28,10 @@ func New() TodoParser {
 	return &todoParser{}
 }
 
-func (p *todoParser) GetTodos(urls ...string) []tracker.Issue {
+func (p *todoParser) GetTodos(urls ...string) []issue.Issue {
 
 	jobs := make(chan string, 100)
-	results := make(chan tracker.Issue, 100)
+	results := make(chan issue.Issue, 100)
 	finished := make(chan struct{})
 
 	wg := &sync.WaitGroup{}
@@ -49,11 +50,11 @@ func (p *todoParser) GetTodos(urls ...string) []tracker.Issue {
 		close(jobs) // close the jobs channel so goroutines gracefully stop when no jobs are left
 	}()
 
-	issues := make([]tracker.Issue, 0)
+	issues := make([]issue.Issue, 0)
 	go func() {
 		log.Debug("collecting results from workers")
-		for issue := range results {
-			issues = append(issues, issue)
+		for is := range results {
+			issues = append(issues, is)
 		}
 		finished <- struct{}{} // let the main thread know we're done collecting issues
 	}()
@@ -74,7 +75,7 @@ func (p *todoParser) GetTodos(urls ...string) []tracker.Issue {
 }
 
 // worker downloads and parses a file given a url
-func worker(wg *sync.WaitGroup, urlChan <-chan string, results chan<- tracker.Issue) {
+func worker(wg *sync.WaitGroup, urlChan <-chan string, results chan<- issue.Issue) {
 	for u := range urlChan {
 		log.Info("worker recvd ", u)
 		rc, err := DownloadFile(client, u)

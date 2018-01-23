@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/log"
-	"github.com/while-loop/todo/pkg/tracker"
 	"github.com/while-loop/todo/pkg/vcs/config"
 )
 
@@ -16,10 +16,10 @@ const (
 type Service struct {
 	router   *mux.Router
 	glClient interface{}
-	issueCh  <-chan tracker.Issue
+	issueCh  <-chan issue.Issue
 }
 
-func NewService(config *config.GitlabConfig, issueChan <-chan tracker.Issue) *Service {
+func NewService(config *config.GitlabConfig, issueChan <-chan issue.Issue) *Service {
 	//ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: app.Config.Gitlab.AccessToken})
 	//oauthClient := oauth2.NewClient(context.Background(), ts)
 	s := &Service{

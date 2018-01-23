@@ -1,32 +1,18 @@
 package tracker
 
 import (
-	"encoding/json"
+	"context"
 
+	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/tracker/config"
+	"github.com/while-loop/todo/pkg/tracker/github"
 )
 
 type Tracker interface {
-	GetIssues() ([]*Issue, error)
-	CreateIssue(issue *Issue) (*Issue, error)
-	DeleteIssue(issue *Issue) error
-}
-
-type Issue struct {
-	ID          string
-	Title       string
-	Description string
-	Assignee    string
-	Author      string
-	Mentions    []string
-	Labels      []string
-	File        string
-	Line        int
-}
-
-func (i *Issue) String() string {
-	bs, _ := json.Marshal(i)
-	return string(bs)
+	GetIssues(ctx context.Context, owner, repo string) ([]*issue.Issue, error)
+	CreateIssue(ctx context.Context, issue *issue.Issue) (*issue.Issue, error)
+	DeleteIssue(ctx context.Context, issue *issue.Issue) error
+	Name() string
 }
 
 type Manager struct {
@@ -37,8 +23,10 @@ type Manager struct {
 func NewManager(config *config.TrackerConfig) *Manager {
 	m := &Manager{
 		trackers: map[string]Tracker{},
+		config:   config,
 	}
 
+	m.initTrackers()
 	return m
 }
 
@@ -50,7 +38,8 @@ func (m *Manager) initTrackers() {
 	conf := m.config
 
 	if conf.Github != nil {
-
+		g := github.NewTracker(m.config.Github)
+		m.trackers[g.Name()] = g
 	}
 
 	if conf.Jira != nil {

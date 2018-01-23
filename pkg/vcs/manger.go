@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/while-loop/todo/pkg/tracker"
+	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/vcs/config"
 	"github.com/while-loop/todo/pkg/vcs/github"
 	"github.com/while-loop/todo/pkg/vcs/gitlab"
@@ -19,14 +19,14 @@ type RepositoryService interface {
 type Manager struct {
 	config    *config.VcsConfig
 	services  map[string]RepositoryService
-	issueChan chan tracker.Issue
+	issueChan chan issue.Issue
 }
 
 func NewManager(config *config.VcsConfig) *Manager {
 	m := &Manager{
 		config:    config,
 		services:  map[string]RepositoryService{},
-		issueChan: make(chan tracker.Issue),
+		issueChan: make(chan issue.Issue),
 	}
 
 	m.initServices()
@@ -37,7 +37,7 @@ func (m *Manager) Services() map[string]RepositoryService {
 	return m.services
 }
 
-func (m *Manager) IssueChan() <-chan tracker.Issue {
+func (m *Manager) IssueChan() <-chan issue.Issue {
 	return m.issueChan
 }
 

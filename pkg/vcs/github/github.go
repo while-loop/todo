@@ -7,16 +7,17 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/hex"
-	"github.com/google/go-github/github"
-	"github.com/gorilla/mux"
-	"github.com/while-loop/todo/pkg/log"
-	"github.com/while-loop/todo/pkg/parser"
-	"github.com/while-loop/todo/pkg/tracker"
-	"github.com/while-loop/todo/pkg/vcs/config"
-	"golang.org/x/oauth2"
 	"hash"
 	"io/ioutil"
 	"strings"
+
+	"github.com/google/go-github/github"
+	"github.com/gorilla/mux"
+	"github.com/while-loop/todo/pkg/issue"
+	"github.com/while-loop/todo/pkg/log"
+	"github.com/while-loop/todo/pkg/parser"
+	"github.com/while-loop/todo/pkg/vcs/config"
+	"golang.org/x/oauth2"
 )
 
 const (
@@ -29,13 +30,13 @@ const (
 type Service struct {
 	router        *mux.Router
 	ghClient      *github.Client
-	issueCh       chan<- tracker.Issue
+	issueCh       chan<- issue.Issue
 	eventHandlers map[string]http.HandlerFunc
 	config        *config.GithubConfig
 	parser        parser.TodoParser
 }
 
-func NewService(config *config.GithubConfig, issueChan chan<- tracker.Issue) *Service {
+func NewService(config *config.GithubConfig, issueChan chan<- issue.Issue) *Service {
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.AccessToken})
 	oauthClient := oauth2.NewClient(context.Background(), ts)
 	s := &Service{

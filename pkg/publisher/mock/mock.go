@@ -5,8 +5,8 @@ import (
 
 	"fmt"
 
+	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/publisher/config"
-	"github.com/while-loop/todo/pkg/tracker"
 )
 
 const (
@@ -30,7 +30,7 @@ func (s *MockPub) Name() string {
 	return name
 }
 
-func (s *MockPub) Publish(issue *tracker.Issue) error {
+func (s *MockPub) Publish(issue *issue.Issue) error {
 	fmt.Fprintln(s.out, issue)
 	return nil
 }

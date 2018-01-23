@@ -1,13 +1,13 @@
 package publisher
 
 import (
+	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/publisher/config"
 	"github.com/while-loop/todo/pkg/publisher/mock"
-	"github.com/while-loop/todo/pkg/tracker"
 )
 
 type Publisher interface {
-	Publish(issue *tracker.Issue) error
+	Publish(issue *issue.Issue) error
 }
 
 type Manager struct {

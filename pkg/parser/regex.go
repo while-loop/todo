@@ -3,14 +3,15 @@ package parser
 import (
 	"bufio"
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/while-loop/todo/pkg/log"
-	"github.com/while-loop/todo/pkg/tracker"
 	"io"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/pkg/errors"
+	"github.com/while-loop/todo/pkg/issue"
+	"github.com/while-loop/todo/pkg/log"
 )
 
 const (
@@ -34,9 +35,9 @@ func init() {
 	sort.Strings(hashLangs)
 }
 
-func ParseFile(fileName string, file io.ReadCloser) ([]tracker.Issue, error) {
+func ParseFile(fileName string, file io.ReadCloser) ([]issue.Issue, error) {
 	defer file.Close()
-	issues := make([]tracker.Issue, 0)
+	issues := make([]issue.Issue, 0)
 	ext := strings.TrimLeft(filepath.Ext(fileName), ".")
 	if ext == "" {
 		log.Errorf("failed to get file ext for %s", fileName)
@@ -94,14 +95,14 @@ func commentRegexes(ext string) *regexp.Regexp {
 	return nil
 }
 
-func parseLine(rexp *regexp.Regexp, line string) (tracker.Issue, bool) {
+func parseLine(rexp *regexp.Regexp, line string) (issue.Issue, bool) {
 
 	finds := rexp.FindStringSubmatch(line)
 	if len(finds) <= 0 {
-		return tracker.Issue{}, false
+		return issue.Issue{}, false
 	}
 
-	i := tracker.Issue{
+	i := issue.Issue{
 		Mentions:    mentionsRegex.FindAllString(line, -1),
 		Labels:      parseLabels(line),
 		File:        "",
