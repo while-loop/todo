@@ -19,14 +19,14 @@ type RepositoryService interface {
 type Manager struct {
 	config    *config.VcsConfig
 	services  map[string]RepositoryService
-	issueChan chan issue.Issue
+	issueChan chan []*issue.Issue
 }
 
 func NewManager(config *config.VcsConfig) *Manager {
 	m := &Manager{
 		config:    config,
 		services:  map[string]RepositoryService{},
-		issueChan: make(chan issue.Issue),
+		issueChan: make(chan []*issue.Issue),
 	}
 
 	m.initServices()
@@ -37,7 +37,7 @@ func (m *Manager) Services() map[string]RepositoryService {
 	return m.services
 }
 
-func (m *Manager) IssueChan() <-chan issue.Issue {
+func (m *Manager) IssueChan() <-chan []*issue.Issue {
 	return m.issueChan
 }
 

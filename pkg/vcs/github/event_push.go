@@ -3,11 +3,12 @@ package github
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/luci/go-render/render"
-	"github.com/while-loop/todo/pkg/log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/luci/go-render/render"
+	"github.com/while-loop/todo/pkg/log"
 )
 
 const (
@@ -40,15 +41,13 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// foreach file, get all todos
-	todos := s.parser.GetTodos(suspects...)
+	todos := s.parser.GetTodos(event.Repository.Owner.Name, event.Repository.Name, suspects...)
 	fmt.Println(suspects)
 
 	// send todos to issuechan (tracker will handle reducing and filtering) !todo
 	log.Infof("found %d todos in github push %s", len(todos), event.HeadCommit.URL)
 	go func() {
-		for _, t := range todos {
-			s.issueCh <- t
-		}
+		s.issueCh <- todos
 	}()
 
 	w.WriteHeader(http.StatusOK)

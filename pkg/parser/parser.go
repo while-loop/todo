@@ -18,7 +18,7 @@ var (
 )
 
 type TodoParser interface {
-	GetTodos(urls ...string) []issue.Issue
+	GetTodos(owner, repo string, urls ...string) []*issue.Issue
 }
 
 type todoParser struct {
@@ -28,7 +28,7 @@ func New() TodoParser {
 	return &todoParser{}
 }
 
-func (p *todoParser) GetTodos(urls ...string) []issue.Issue {
+func (p *todoParser) GetTodos(owner, repo string, urls ...string) []*issue.Issue {
 
 	jobs := make(chan string, 100)
 	results := make(chan issue.Issue, 100)
@@ -50,11 +50,13 @@ func (p *todoParser) GetTodos(urls ...string) []issue.Issue {
 		close(jobs) // close the jobs channel so goroutines gracefully stop when no jobs are left
 	}()
 
-	issues := make([]issue.Issue, 0)
+	issues := make([]*issue.Issue, 0)
 	go func() {
 		log.Debug("collecting results from workers")
 		for is := range results {
-			issues = append(issues, is)
+			is.Owner = owner
+			is.Repo = repo
+			issues = append(issues, &is)
 		}
 		finished <- struct{}{} // let the main thread know we're done collecting issues
 	}()

@@ -25,7 +25,7 @@ func New(config *config.Config) *App {
 
 	return &App{
 		RepoMan:      rp,
-		TrackerMan:   tracker.NewManager(config.TrackerConfig),
+		TrackerMan:   tracker.NewManager(config.TrackerConfig, rp.IssueChan()),
 		PublisherMan: publisher.NewManager(config.PublisherConfig),
 		Router:       router,
 		Config:       config,

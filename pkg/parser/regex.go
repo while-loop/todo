@@ -46,8 +46,8 @@ func ParseFile(fileName string, file io.ReadCloser) ([]issue.Issue, error) {
 
 	rexp := commentRegexes(ext)
 	if rexp == nil {
-		log.Errorf("parser regex. unknown ext type: %s", ext)
-		return nil, fmt.Errorf("unknown file ext: %s", ext)
+		log.Warnf("parser regex. unknown ext type: %s", ext)
+		return nil, nil
 	}
 
 	scan := bufio.NewScanner(file)
@@ -69,8 +69,6 @@ func ParseFile(fileName string, file io.ReadCloser) ([]issue.Issue, error) {
 			is.Line = lineNum
 			//log.Debugf("found issue: %s\n%s", line, is.String())
 			issues = append(issues, is)
-		} else {
-			log.Debug(line)
 		}
 	}
 
@@ -102,8 +100,13 @@ func parseLine(rexp *regexp.Regexp, line string) (issue.Issue, bool) {
 		return issue.Issue{}, false
 	}
 
+	ms := mentionsRegex.FindAllString(line, -1)
+	if ms == nil {
+		ms = []string{}
+	}
+
 	i := issue.Issue{
-		Mentions:    mentionsRegex.FindAllString(line, -1),
+		Mentions:    ms,
 		Labels:      parseLabels(line),
 		File:        "",
 		Line:        0,
@@ -139,7 +142,7 @@ func filterTitle(line string, mentions, labels []string) string {
 }
 
 func parseLabels(line string) []string {
-	var labels []string
+	labels := []string{}
 
 	for _, groups := range labelsRegex.FindAllStringSubmatch(line, -1) {
 		if len(groups) < 2 {

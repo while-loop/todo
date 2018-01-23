@@ -1,11 +1,12 @@
 package parser
 
 import (
-	"github.com/stretchr/testify/require"
-	"github.com/while-loop/todo/pkg/tracker"
 	"regexp"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+	"github.com/while-loop/todo/pkg/issue"
 )
 
 func TestRegexInit(t *testing.T) {
@@ -42,22 +43,22 @@ func TestTODOs(t *testing.T) {
 	tcs := []struct {
 		comment string
 		rexp    *regexp.Regexp
-		is      tracker.Issue
+		is      issue.Issue
 	}{
-		{"// todo hello world", slashRegex, tracker.Issue{Title: "hello world"}},
+		{"// todo hello world", slashRegex, issue.Issue{Title: "hello world"}},
 		{"line of code", slashRegex, e},
 		{`// using the command "grep -nri -E "^.*//\s*todo.*" > etcdTodos.txt"`, slashRegex, e},
 		{"// this is a list of TODOs found in the root directory of https://github.com/coreos/etcd", slashRegex, e},
-		{"# todo(snake): impl python", hashRegex, tracker.Issue{Title: "impl python", Assignee: "snake"}},
-		{"# todo(snake) impl python", hashRegex, tracker.Issue{Title: "impl python", Assignee: "snake"}},
-		{`// fmt.Println("uh oh") todo(snake): eol comment`, slashRegex, tracker.Issue{Title: "eol comment", Assignee: "snake"}},
-		{"// todo(while-loop): @dev1 finish tests +test +api", slashRegex, tracker.Issue{ // 4
+		{"# todo(snake): impl python", hashRegex, issue.Issue{Title: "impl python", Assignee: "snake"}},
+		{"# todo(snake) impl python", hashRegex, issue.Issue{Title: "impl python", Assignee: "snake"}},
+		{`// fmt.Println("uh oh") todo(snake): eol comment`, slashRegex, issue.Issue{Title: "eol comment", Assignee: "snake"}},
+		{"// todo(while-loop): @dev1 finish tests +test +api", slashRegex, issue.Issue{ // 4
 			Title:    "finish tests",
 			Labels:   []string{"test", "api"},
 			Mentions: []string{"@dev1"},
 			Assignee: "while-loop",
 		}},
-		{`// todo(while-loop): add ignore keyword to yml config (ParseFile will be a todoParser func)`, slashRegex, tracker.Issue{ //5
+		{`// todo(while-loop): add ignore keyword to yml config (ParseFile will be a todoParser func)`, slashRegex, issue.Issue{ //5
 			Assignee: "while-loop",
 			Title:    "add ignore keyword to yml config (ParseFile will be a todoParser func)",
 		}},
@@ -116,4 +117,4 @@ func getIdx(arr []string, item string) int {
 	return -1
 }
 
-var e = tracker.Issue{}
+var e = issue.Issue{}

@@ -27,6 +27,7 @@ type Tracker struct {
 }
 
 func NewTracker(cfg *config.GithubConfig) *Tracker {
+	// todo create ghclient with accesstoken from github app
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: cfg.AccessToken})
 	oauthClient := oauth2.NewClient(context.Background(), ts)
 	return &Tracker{
@@ -37,7 +38,6 @@ func NewTracker(cfg *config.GithubConfig) *Tracker {
 
 func (t *Tracker) GetIssues(ctx context.Context, owner, repo string) ([]*issue.Issue, error) {
 	gIss, _, err := t.ghClient.Issues.ListByRepo(ctx, owner, repo, &github.IssueListByRepoOptions{
-		State:       "open",
 		ListOptions: github.ListOptions{PerPage: 50},
 	})
 	if err != nil {
@@ -56,12 +56,11 @@ func (t *Tracker) GetIssues(ctx context.Context, owner, repo string) ([]*issue.I
 
 func (t *Tracker) CreateIssue(ctx context.Context, issue *issue.Issue) (*issue.Issue, error) {
 	is, _, err := t.ghClient.Issues.Create(ctx, issue.Owner, issue.Repo, &github.IssueRequest{
-		Title:     &issue.Title,
-		Body:      &issue.Description,
-		Labels:    &issue.Labels,
-		Assignee:  &issue.Assignee,
-		State:     pString("open"),
-		Assignees: &issue.Mentions,
+		Title:    &issue.Title,
+		Body:     &issue.Description,
+		Labels:   &issue.Labels,
+		Assignee: &issue.Assignee,
+		State:    pString("open"),
 	})
 
 	if err != nil {
@@ -93,7 +92,7 @@ func (t *Tracker) Name() string {
 }
 
 func parseLabels(gLs []github.Label) []string {
-	ls := make([]string, 0)
+	ls := []string{}
 	for _, gL := range gLs {
 		ls = append(ls, gL.GetName())
 	}

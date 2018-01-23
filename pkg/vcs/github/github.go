@@ -30,13 +30,13 @@ const (
 type Service struct {
 	router        *mux.Router
 	ghClient      *github.Client
-	issueCh       chan<- issue.Issue
+	issueCh       chan<- []*issue.Issue
 	eventHandlers map[string]http.HandlerFunc
 	config        *config.GithubConfig
 	parser        parser.TodoParser
 }
 
-func NewService(config *config.GithubConfig, issueChan chan<- issue.Issue) *Service {
+func NewService(config *config.GithubConfig, issueChan chan<- []*issue.Issue) *Service {
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.AccessToken})
 	oauthClient := oauth2.NewClient(context.Background(), ts)
 	s := &Service{
