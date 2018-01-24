@@ -4,6 +4,8 @@ import (
 	"os"
 	"reflect"
 
+	"context"
+
 	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/log"
 	"github.com/while-loop/todo/pkg/parser"
@@ -61,5 +63,6 @@ func i(is issue.Issue) *issue.Issue {
 	is.Mentions = []string{}
 	is.Labels = []string{}
 	is.Commit = "master"
+	is.Ctx = context.Background()
 	return &is
 }

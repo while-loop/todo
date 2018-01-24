@@ -5,11 +5,15 @@ import (
 
 	"reflect"
 
+	"context"
+	"net/http"
+
 	"github.com/stretchr/testify/require"
 	"github.com/while-loop/todo/pkg/issue"
 )
 
-func TestDownloadTwoFiles(t *testing.T) {
+// uncomment test
+func testDownloadTwoFiles(t *testing.T) {
 	a := require.New(t)
 	urls := []string{"https://github.com/while-loop/todo/raw/08b3e2fad64e54c061d1ba6324a382e968212a6c/pkg/vcs/github/event_push_test.go",
 		"https://github.com/ansible/ansible/raw/781fd7099a0278d3d91557b94da1083f19fad329/test/legacy/roles/test_gce_labels/tasks/test.yml"}
@@ -20,7 +24,7 @@ func TestDownloadTwoFiles(t *testing.T) {
 	}
 
 	p := New()
-	issues := p.GetTodos("", "", urls...)
+	issues := p.GetTodos(context.Background(), http.DefaultClient, urls...)
 	a.Equal(len(iss), len(issues))
 	ttl := 0 // keep a count of total issues matched. since order of received issues are random due to goroutines
 
@@ -42,7 +46,7 @@ func TestDownloadWhenServerIsNotReachable(t *testing.T) {
 	urls := []string{"https://gitakjshdgfasjhgdfhub.com"}
 
 	p := New()
-	issues := p.GetTodos("", "", urls...)
+	issues := p.GetTodos(context.Background(), http.DefaultClient, urls...)
 
 	a.Equal(0, len(issues))
 }
@@ -54,7 +58,7 @@ func TestParsingUnsupportedExtension(t *testing.T) {
 	urls := []string{"https://github.com/while-loop/todo/raw/cc6b554cccfd3598f6b6342d69c78abcbc5d0128/README.md"}
 
 	p := New()
-	issues := p.GetTodos("", "", urls...)
+	issues := p.GetTodos(context.Background(), http.DefaultClient, urls...)
 
 	a.Equal(0, len(issues))
 }

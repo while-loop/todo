@@ -7,7 +7,7 @@ import (
 )
 
 func TestContentUrl(t *testing.T) {
-	exp := "https://github.com/while-loop/test/raw/abcezas123/my/first/file.go"
+	exp := "https://raw.githubusercontent.com/while-loop/test/abcezas123/my/first/file.go"
 	sha := "abcezas123"
 	path := "my/first/file.go"
 	owner := "while-loop"

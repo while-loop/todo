@@ -75,10 +75,6 @@ func ParseFile(fileName string, file io.ReadCloser) ([]*issue.Issue, error) {
 		}
 	}
 
-	for _, is := range issues {
-		is.Ctx = context.WithValue(is.Ctx, "total_lines", lineNum)
-	}
-
 	if scan.Err() != nil {
 		return issues, errors.Wrapf(scan.Err(), "error while scanning file: %s", fileName)
 	}
