@@ -51,7 +51,7 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 	// foreach file, get all todos
 	ctx := context.WithValue(context.Background(), "owner", event.Repository.Owner.Name)
 	ctx = context.WithValue(ctx, "repo", event.Repository.Name)
-	ctx = context.WithValue(ctx, "author", event.HeadCommit.Author.Name)
+	ctx = context.WithValue(ctx, "author", event.HeadCommit.Author.Username)
 	ctx = context.WithValue(ctx, "commit", event.HeadCommit.ID)
 	ctx = context.WithValue(ctx, "installation", event.Installation.ID)
 
