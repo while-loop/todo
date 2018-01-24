@@ -2,6 +2,8 @@ vcs:
   github:
     access_token: "my_access_token"
     webhook_secret: "webhook_secret"
+    private_key: "RSA_PRIVATE_KEY"
+    issue_number: 8675309
   gitlab:
     access_token: "my_access_token"
 
@@ -10,6 +12,8 @@ trackers:
     access_token: "my_access_token"
   github:
     access_token: "my_access_token"
+    private_key: "RSA_PRIVATE_KEY"
+    issue_number: 8675309
 
 publishers:
   mock:

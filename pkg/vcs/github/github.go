@@ -11,13 +11,11 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/google/go-github/github"
 	"github.com/gorilla/mux"
 	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/log"
 	"github.com/while-loop/todo/pkg/parser"
 	"github.com/while-loop/todo/pkg/vcs/config"
-	"golang.org/x/oauth2"
 )
 
 const (
@@ -29,7 +27,6 @@ const (
 
 type Service struct {
 	router        *mux.Router
-	ghClient      *github.Client
 	issueCh       chan<- []*issue.Issue
 	eventHandlers map[string]http.HandlerFunc
 	config        *config.GithubConfig
@@ -37,12 +34,9 @@ type Service struct {
 }
 
 func NewService(config *config.GithubConfig, issueChan chan<- []*issue.Issue) *Service {
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.AccessToken})
-	oauthClient := oauth2.NewClient(context.Background(), ts)
 	s := &Service{
 		issueCh:       issueChan,
 		router:        mux.NewRouter(),
-		ghClient:      github.NewClient(oauthClient),
 		eventHandlers: map[string]http.HandlerFunc{},
 		config:        config,
 		parser:        parser.New(), // todo(while-loop) add parser as param

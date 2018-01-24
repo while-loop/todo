@@ -7,15 +7,23 @@ import (
 	"strings"
 	"time"
 
+	"context"
+
+	"github.com/bradleyfalzon/ghinstallation"
 	"github.com/luci/go-render/render"
+	"github.com/pkg/errors"
 	"github.com/while-loop/todo/pkg/log"
 )
 
 const (
-	repoTag = "{full_repo}"
-	shaTag  = "{sha}"
-	pathTag = "{path}"
-	rawUrl  = "https://github.com/" + repoTag + "/raw/" + shaTag + "/" + pathTag
+	ownerTag = "{owner}"
+	repoTag  = "{repo}"
+	shaTag   = "{sha}"
+	pathTag  = "{path}"
+)
+
+var (
+	rawUrl = fmt.Sprintf("https://raw.githubusercontent.com/%s/%s/%s/%s", ownerTag, repoTag, shaTag, pathTag)
 )
 
 func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
@@ -36,15 +44,27 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 				// todo add "exclude" (array) to vcs config struct. match regex
 				continue
 			}
-			suspects = append(suspects, contentUrl(event.Repository.FullName, commit.ID, fPath))
+			suspects = append(suspects, contentUrl(event.Repository.Owner.Name, event.Repository.Name, commit.ID, fPath))
 		}
 	}
 
 	// foreach file, get all todos
-	todos := s.parser.GetTodos(event.Repository.Owner.Name, event.Repository.Name, suspects...)
-	fmt.Println(suspects)
+	ctx := context.WithValue(context.Background(), "owner", event.Repository.Owner.Name)
+	ctx = context.WithValue(ctx, "repo", event.Repository.Name)
+	ctx = context.WithValue(ctx, "author", event.HeadCommit.Author.Name)
+	ctx = context.WithValue(ctx, "commit", event.HeadCommit.ID)
+	ctx = context.WithValue(ctx, "installation", event.Installation.ID)
 
-	// send todos to issuechan (tracker will handle reducing and filtering) !todo
+	// todo choose from app installation of oauth
+	itr, err := ghinstallation.New(http.DefaultTransport, s.config.IssueNumber, event.Installation.ID, []byte(s.config.PrivateKey))
+	if err != nil {
+		log.Error(errors.Wrap(err, "failed to create ghinstallation client"))
+		return
+	}
+
+	todos := s.parser.GetTodos(ctx, &http.Client{Transport: itr, Timeout: 10 * time.Second}, suspects...)
+
+	// send todos to issuechan (tracker will handle reducing and filtering)
 	log.Infof("found %d todos in github push %s", len(todos), event.HeadCommit.URL)
 	go func() {
 		s.issueCh <- todos
@@ -53,8 +73,8 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func contentUrl(fullRepoName, sha, path string) string {
-	return strings.NewReplacer(pathTag, path, repoTag, fullRepoName, shaTag, sha).Replace(rawUrl)
+func contentUrl(owner, repo, sha, path string) string {
+	return strings.NewReplacer(pathTag, path, repoTag, repo, ownerTag, owner, shaTag, sha).Replace(rawUrl)
 }
 
 type PushEvent struct {
@@ -205,4 +225,7 @@ type PushEvent struct {
 		Type              string `json:"type"`
 		SiteAdmin         bool   `json:"site_admin"`
 	} `json:"sender"`
+	Installation struct {
+		ID int `json:"id"`
+	} `json:"installation"`
 }

@@ -21,8 +21,9 @@
 .idea/libraries
 
 .idea
-
+*.pem
 myconfig.yml
+t_test.go
 
 # Mongo Explorer plugin:
 .idea/mongoSettings.xml

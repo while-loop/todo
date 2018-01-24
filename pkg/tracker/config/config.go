@@ -7,6 +7,8 @@ type TrackerConfig struct {
 
 type GithubConfig struct {
 	AccessToken string `json:"access_token" yaml:"access_token"`
+	PrivateKey  string `json:"private_key" yaml:"private_key"`
+	IssueNumber int    `json:"issue_number" yaml:"issue_number"`
 }
 
 type JiraConfig struct {
