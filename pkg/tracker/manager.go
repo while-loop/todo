@@ -3,7 +3,7 @@ package tracker
 import (
 	"context"
 
-	"time"
+	"sync"
 
 	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/log"
@@ -43,11 +43,9 @@ func (m *Manager) loop() {
 		}
 
 		for _, tr := range m.trackers {
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			tIss, err := tr.GetIssues(ctx, iss[0].Owner, iss[0].Repo)
+			tIss, err := tr.GetIssues(iss[0].Ctx, iss[0].Owner, iss[0].Repo)
 			if err != nil {
 				log.Error(err)
-				cancel()
 				continue
 			}
 
@@ -55,15 +53,17 @@ func (m *Manager) loop() {
 			log.Info(iss)
 			log.Info(toCreate)
 			log.Infof("need to create %d issues", len(toCreate))
-			ctx, _ = context.WithTimeout(context.Background(), 5*time.Second)
+			var wg sync.WaitGroup
 			for _, cr := range toCreate {
+				wg.Add(1)
 				go func(i *issue.Issue) {
 					log.Info("tocreat: ", i)
-					if is, err := tr.CreateIssue(ctx, i); err != nil {
+					if is, err := tr.CreateIssue(i.Ctx, i); err != nil {
 						log.Error(err)
 					} else {
 						log.Infof("Created issue: %s/%s/%s", is.Owner, is.Repo, is.ID)
 					}
+					wg.Done()
 				}(cr)
 			}
 		}

@@ -52,6 +52,9 @@ func (p *todoParser) GetTodos(ctx context.Context, client *http.Client, urls ...
 		for is := range results {
 			is.Owner = ctx.Value("owner").(string)
 			is.Repo = ctx.Value("repo").(string)
+			is.Author = ctx.Value("author").(string)
+			is.Commit = ctx.Value("commit").(string)
+			is.Ctx = ctx
 			issues = append(issues, is)
 		}
 		finished <- struct{}{} // let the main thread know we're done collecting issues

@@ -1,6 +1,9 @@
 package issue
 
-import "encoding/json"
+import (
+	"context"
+	"encoding/json"
+)
 
 type Issue struct {
 	ID          string
@@ -15,6 +18,7 @@ type Issue struct {
 	Owner       string
 	Repo        string
 	Commit      string
+	Ctx         context.Context
 }
 
 func (i *Issue) String() string {

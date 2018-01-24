@@ -9,6 +9,8 @@ import (
 	"sort"
 	"strings"
 
+	"context"
+
 	"github.com/pkg/errors"
 	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/log"
@@ -73,6 +75,10 @@ func ParseFile(fileName string, file io.ReadCloser) ([]*issue.Issue, error) {
 		}
 	}
 
+	for _, is := range issues {
+		is.Ctx = context.WithValue(is.Ctx, "total_lines", lineNum)
+	}
+
 	if scan.Err() != nil {
 		return issues, errors.Wrapf(scan.Err(), "error while scanning file: %s", fileName)
 	}
@@ -116,6 +122,7 @@ func parseLine(rexp *regexp.Regexp, line string) (*issue.Issue, bool) {
 		Assignee:    "",
 		Author:      "",
 		Description: "",
+		Ctx:         context.Background(),
 	}
 
 	for idx, name := range rexp.SubexpNames() {
