@@ -133,7 +133,7 @@ func createBlobUrl(is *issue.Issue) string {
 	if start < 1 {
 		start = 1
 	}
-	end := start + 3
+	end := start + 6
 
 	// todo(while-loop) get total lines in files from ctx
 	//if end > is.Ctx.Value("total_lines").(int) {

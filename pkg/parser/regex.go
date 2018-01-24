@@ -146,7 +146,7 @@ func filterTitle(line string, mentions, labels []string) string {
 }
 
 func parseLabels(line string) []string {
-	labels := []string{}
+	labels := []string{"todo"}
 
 	for _, groups := range labelsRegex.FindAllStringSubmatch(line, -1) {
 		if len(groups) < 2 {

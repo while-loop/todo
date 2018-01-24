@@ -18,7 +18,7 @@ type Issue struct {
 	Owner       string
 	Repo        string
 	Commit      string
-	Ctx         context.Context
+	Ctx         context.Context // todo Issue.Ctx from Context to map
 }
 
 func (i *Issue) String() string {
