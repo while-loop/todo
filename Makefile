@@ -52,4 +52,3 @@ lint: ## apply golint
 test: lint ## test service code
 	@echo "[test] running tests w/ cover"
 	go test ./... -cover
-	go run test/etcd_todos.go
