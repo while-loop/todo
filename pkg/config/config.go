@@ -18,8 +18,8 @@ import (
 )
 
 type Config struct {
-	TrackerConfig   *configt.TrackerConfig   `json:"trackers" yaml:"trackers"`
-	VcsConfig       *configv.VcsConfig       `json:"vcs" yaml:"vcs"`
+	TrackerConfig *configt.TrackerConfig `json:"trackers" yaml:"trackers"`
+	VcsConfig     *configv.VcsConfig     `json:"vcs" yaml:"vcs"`
 }
 
 func ParseFile(filePath string) (*Config, error) {

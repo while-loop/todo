@@ -10,10 +10,10 @@ import (
 )
 
 type App struct {
-	RepoMan      *vcs.Manager
-	TrackerMan   *tracker.Manager
-	Router       *mux.Router
-	Config       *config.Config
+	RepoMan    *vcs.Manager
+	TrackerMan *tracker.Manager
+	Router     *mux.Router
+	Config     *config.Config
 }
 
 func New(config *config.Config) *App {
@@ -22,10 +22,10 @@ func New(config *config.Config) *App {
 	rp.ApplyRouter(router)
 
 	return &App{
-		RepoMan:      rp,
-		TrackerMan:   tracker.NewManager(config.TrackerConfig, rp.IssueChan()),
-		Router:       router,
-		Config:       config,
+		RepoMan:    rp,
+		TrackerMan: tracker.NewManager(config.TrackerConfig, rp.IssueChan()),
+		Router:     router,
+		Config:     config,
 	}
 }
 
