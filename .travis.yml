@@ -3,9 +3,10 @@ language: go
 go:
   - 1.9
 before_install:
-  - go get github.com/mattn/goveralls
   - sudo apt-get -qq update
   - sudo apt-get install -y make
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
   - make deps
 install:
   - make all
