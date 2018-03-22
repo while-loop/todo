@@ -38,7 +38,7 @@ cont: ## build a non-cached service container
 cont-c: ## build a cached service container
 	docker build -t ${IMAGE_NAME} -t ${IMAGE_NAME}:${VERSION} .
 
-deploy: ## deploy lastest built container to docker hub
+deploy: cont ## deploy lastest built container to docker hub
 	docker push ${IMAGE_NAME}
 
 deps: ## get service pkg + test deps
