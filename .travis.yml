@@ -6,7 +6,7 @@ before_install:
   - go get github.com/mattn/goveralls
   - sudo apt-get -qq update
   - sudo apt-get install -y make
-  - go get -t ./...
+  - make deps
 install:
   - make all
   - todod -v
