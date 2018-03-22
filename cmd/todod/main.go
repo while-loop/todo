@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	"github.com/while-loop/todo/pkg"
 	"github.com/while-loop/todo/pkg/config"
 	"github.com/while-loop/todo/pkg/log"
@@ -36,7 +37,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	app := todo.New(conf)
+	app := todo.New(conf, mux.NewRouter())
 
 	log.Info("Repo services ", app.RepoMan.Services())
 	log.Info("Tracker services ", app.TrackerMan.Trackers())

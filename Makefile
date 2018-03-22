@@ -54,7 +54,7 @@ lambda: clean lint ## build the lambda binary for todo
 		-X ${PACKAGE}/pkg.BuildTime=${BUILD_TIME}" \
 		-o deploy/${LAMBDA_TARGET} ./cmd/${LAMBDA_TARGET}
 	@deploy/./${LAMBDA_TARGET} version
-	@zip deployment.zip deploy
+	@zip -j -r deployment.zip deploy/*
 
 lambda-deploy: lambda
 	aws lambda update-function-code \

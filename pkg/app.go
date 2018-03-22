@@ -16,8 +16,7 @@ type App struct {
 	Config     *config.Config
 }
 
-func New(config *config.Config) *App {
-	router := mux.NewRouter()
+func New(config *config.Config, router *mux.Router) *App {
 	rp := vcs.NewManager(config.VcsConfig)
 	rp.ApplyRouter(router)
 
