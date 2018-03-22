@@ -4,48 +4,31 @@ import (
 	"os"
 	"reflect"
 
-	"context"
-
 	"github.com/while-loop/todo/pkg/issue"
-	"github.com/while-loop/todo/pkg/log"
 	"github.com/while-loop/todo/pkg/parser"
+	"testing"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-var fileName = `test/etcdTodos.test`
+var fileName = `etcdTodos.test`
 
-func main() {
+func TestEtd(t *testing.T) {
 	// this is a list of TODOs found in the root directory of https://github.com/coreos/etcd
 	// using the command `grep -nri -E "^.*//\s*todo.*" > etcdTodos.txt`
 	// empty todos are not treated as issues
 
-	fail := false
-
 	f, err := os.Open(fileName)
-	if err != nil {
-		panic(err)
-	}
+	require.Nil(t, err)
 
-	issues, err := parser.ParseFile(fileName, f)
-	if err != nil {
-		panic(err)
-	}
+	issues, lines, err := parser.ParseFile(fileName, f)
+	require.Nil(t, err)
 
-	if len(issues) != 441 {
-		log.Errorf("wrong issue len. want %v, got %v", 441, len(issues))
-		fail = true
-	}
+	assert.Equal(t, len(issues), lines)
+	assert.Equal(t, 441, len(issues))
 
 	for _, ei := range expIssues {
-		if !reflect.DeepEqual(ei, issues[ei.Line-1]) {
-			log.Errorf("issue not equal\nwant:\n%v\ngot:\n%v", ei, issues[ei.Line-1])
-			fail = true
-		}
-	}
-
-	if fail {
-		os.Exit(2)
-	} else {
-		log.Info("core os test passed")
+		assert.True(t, reflect.DeepEqual(ei, issues[ei.Line-1]), "title: %s", ei.Title)
 	}
 }
 
@@ -63,6 +46,6 @@ func i(is issue.Issue) *issue.Issue {
 	is.Mentions = []string{}
 	is.Labels = []string{}
 	is.Commit = "master"
-	is.Ctx = context.Background()
+	is.Extras = map[string]interface{}{}
 	return &is
 }

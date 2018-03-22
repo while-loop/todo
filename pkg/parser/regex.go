@@ -9,8 +9,6 @@ import (
 	"sort"
 	"strings"
 
-	"context"
-
 	"github.com/pkg/errors"
 	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/log"
@@ -37,19 +35,19 @@ func init() {
 	sort.Strings(hashLangs)
 }
 
-func ParseFile(fileName string, file io.ReadCloser) ([]*issue.Issue, error) {
+func ParseFile(fileName string, file io.ReadCloser) ([]*issue.Issue, int, error) {
 	defer file.Close()
 	issues := make([]*issue.Issue, 0)
 	ext := strings.TrimLeft(filepath.Ext(fileName), ".")
 	if ext == "" {
 		log.Errorf("failed to get file ext for %s", fileName)
-		return nil, fmt.Errorf("unknown file ext: %s", ext)
+		return nil, 0, fmt.Errorf("unknown file ext: %s", ext)
 	}
 
 	rexp := commentRegexes(ext)
 	if rexp == nil {
 		log.Warnf("parser regex. unknown ext type: %s", ext)
-		return nil, nil
+		return nil, 0, nil
 	}
 
 	scan := bufio.NewScanner(file)
@@ -76,10 +74,10 @@ func ParseFile(fileName string, file io.ReadCloser) ([]*issue.Issue, error) {
 	}
 
 	if scan.Err() != nil {
-		return issues, errors.Wrapf(scan.Err(), "error while scanning file: %s", fileName)
+		return issues, lineNum, errors.Wrapf(scan.Err(), "error while scanning file: %s", fileName)
 	}
 
-	return issues, nil
+	return issues, lineNum, nil
 }
 
 func commentRegexes(ext string) *regexp.Regexp {
@@ -118,7 +116,7 @@ func parseLine(rexp *regexp.Regexp, line string) (*issue.Issue, bool) {
 		Assignee:    "",
 		Author:      "",
 		Description: "",
-		Ctx:         context.Background(),
+		Extras:      map[string]interface{}{},
 	}
 
 	for idx, name := range rexp.SubexpNames() {
@@ -146,7 +144,7 @@ func filterTitle(line string, mentions, labels []string) string {
 }
 
 func parseLabels(line string) []string {
-	labels := []string{"todo"}
+	labels := []string{}
 
 	for _, groups := range labelsRegex.FindAllStringSubmatch(line, -1) {
 		if len(groups) < 2 {

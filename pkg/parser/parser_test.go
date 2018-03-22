@@ -24,7 +24,7 @@ func testDownloadTwoFiles(t *testing.T) {
 	}
 
 	p := New()
-	issues := p.GetTodos(context.Background(), http.DefaultClient, urls...)
+	issues := p.GetTodos(context.Background(), nil, http.DefaultClient, urls...)
 	a.Equal(len(iss), len(issues))
 	ttl := 0 // keep a count of total issues matched. since order of received issues are random due to goroutines
 
@@ -46,7 +46,7 @@ func TestDownloadWhenServerIsNotReachable(t *testing.T) {
 	urls := []string{"https://gitakjshdgfasjhgdfhub.com"}
 
 	p := New()
-	issues := p.GetTodos(context.Background(), http.DefaultClient, urls...)
+	issues := p.GetTodos(context.Background(), nil, http.DefaultClient, urls...)
 
 	a.Equal(0, len(issues))
 }
@@ -58,7 +58,7 @@ func TestParsingUnsupportedExtension(t *testing.T) {
 	urls := []string{"https://github.com/while-loop/todo/raw/cc6b554cccfd3598f6b6342d69c78abcbc5d0128/README.md"}
 
 	p := New()
-	issues := p.GetTodos(context.Background(), http.DefaultClient, urls...)
+	issues := p.GetTodos(context.Background(), nil, http.DefaultClient, urls...)
 
 	a.Equal(0, len(issues))
 }

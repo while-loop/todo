@@ -12,7 +12,7 @@ import (
 )
 
 type Tracker interface {
-	GetIssues(ctx context.Context, owner, repo string) ([]*issue.Issue, error)
+	GetIssues(ctx context.Context, ref *issue.Issue) ([]*issue.Issue, error)
 	CreateIssue(ctx context.Context, issue *issue.Issue) (*issue.Issue, error)
 	DeleteIssue(ctx context.Context, issue *issue.Issue) error
 	Name() string
@@ -43,7 +43,7 @@ func (m *Manager) loop() {
 		}
 
 		for _, tr := range m.trackers {
-			tIss, err := tr.GetIssues(iss[0].Ctx, iss[0].Owner, iss[0].Repo)
+			tIss, err := tr.GetIssues(context.Background(), iss[0])
 			if err != nil {
 				log.Error(err)
 				continue
@@ -58,7 +58,7 @@ func (m *Manager) loop() {
 				wg.Add(1)
 				go func(i *issue.Issue) {
 					log.Info("tocreat: ", i)
-					if is, err := tr.CreateIssue(i.Ctx, i); err != nil {
+					if is, err := tr.CreateIssue(context.Background(), i); err != nil {
 						log.Error(err)
 					} else {
 						log.Infof("Created issue: %s/%s/%s", is.Owner, is.Repo, is.ID)

@@ -15,7 +15,7 @@ const (
 )
 
 type TodoParser interface {
-	GetTodos(ctx context.Context, client *http.Client, urls ...string) []*issue.Issue
+	GetTodos(ctx context.Context, extras map[string]interface{}, client *http.Client, urls ...string) []*issue.Issue
 }
 
 type todoParser struct {
@@ -25,7 +25,7 @@ func New() TodoParser {
 	return &todoParser{}
 }
 
-func (p *todoParser) GetTodos(ctx context.Context, client *http.Client, urls ...string) []*issue.Issue {
+func (p *todoParser) GetTodos(ctx context.Context, extras map[string]interface{}, client *http.Client, urls ...string) []*issue.Issue {
 	jobs := make(chan string, 100)
 	results := make(chan *issue.Issue, 100)
 	finished := make(chan struct{})
@@ -50,11 +50,11 @@ func (p *todoParser) GetTodos(ctx context.Context, client *http.Client, urls ...
 	go func() {
 		log.Debug("collecting results from workers")
 		for is := range results {
-			is.Owner = ctx.Value("owner").(string)
-			is.Repo = ctx.Value("repo").(string)
-			is.Author = ctx.Value("author").(string)
-			is.Commit = ctx.Value("commit").(string)
-			is.Ctx = ctx
+			is.MergeMap(extras)
+			is.Owner = is.GetString("owner")
+			is.Repo = is.GetString("repo")
+			is.Author = is.GetString("author")
+			is.Commit = is.GetString("commit")
 			issues = append(issues, is)
 		}
 		finished <- struct{}{} // let the main thread know we're done collecting issues
@@ -86,7 +86,7 @@ func worker(wg *sync.WaitGroup, client *http.Client, urlChan <-chan string, resu
 		}
 
 		log.Debug("working parsing file")
-		iss, err := ParseFile(u, rc)
+		iss, lines, err := ParseFile(u, rc)
 		rc.Close()
 		if err != nil {
 			log.Error("worker failed to parse file", err)
@@ -95,6 +95,7 @@ func worker(wg *sync.WaitGroup, client *http.Client, urlChan <-chan string, resu
 
 		if len(iss) > 0 {
 			for _, is := range iss {
+				is.Extras["lines"] = lines
 				results <- is
 			}
 		}

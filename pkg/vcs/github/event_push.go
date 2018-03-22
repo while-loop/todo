@@ -49,11 +49,13 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// foreach file, get all todos
-	ctx := context.WithValue(context.Background(), "owner", event.Repository.Owner.Name)
-	ctx = context.WithValue(ctx, "repo", event.Repository.Name)
-	ctx = context.WithValue(ctx, "author", event.HeadCommit.Author.Username)
-	ctx = context.WithValue(ctx, "commit", event.HeadCommit.ID)
-	ctx = context.WithValue(ctx, "installation", event.Installation.ID)
+	extras := map[string]interface{}{
+		"owner":        event.Repository.Owner.Name,
+		"repo":         event.Repository.Name,
+		"author":       event.HeadCommit.Author.Username,
+		"commit":       event.HeadCommit.ID,
+		"installation": event.Installation.ID,
+	}
 
 	// todo choose from app installation of oauth
 	itr, err := ghinstallation.New(http.DefaultTransport, s.config.IssueNumber, event.Installation.ID, []byte(s.config.PrivateKey))
@@ -62,7 +64,7 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	todos := s.parser.GetTodos(ctx, &http.Client{Transport: itr, Timeout: 10 * time.Second}, suspects...)
+	todos := s.parser.GetTodos(context.Background(), extras, &http.Client{Transport: itr, Timeout: 10 * time.Second}, suspects...)
 
 	// send todos to issuechan (tracker will handle reducing and filtering)
 	log.Infof("found %d todos in github push %s", len(todos), event.HeadCommit.URL)
