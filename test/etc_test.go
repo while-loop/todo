@@ -1,14 +1,14 @@
-package main
+package test
 
 import (
 	"os"
 	"reflect"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/parser"
 	"testing"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 var fileName = `etcdTodos.test`
