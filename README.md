@@ -31,7 +31,7 @@ $ todod
 #### Docker
 
 ```bash
-$ docker run toyotasupra/todo
+$ docker run -d --name todo -v `pwd`:/todo -p 8675:8675 toyotasupra/todo todod -i /todo/config.yml
 ```
 
 Example TODOs

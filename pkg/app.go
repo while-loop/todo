@@ -17,6 +17,8 @@ type App struct {
 }
 
 func New(config *config.Config, router *mux.Router) *App {
+	// todo(while-loop):  fix router random 404 errors on start
+
 	rp := vcs.NewManager(config.VcsConfig)
 	rp.ApplyRouter(router)
 
