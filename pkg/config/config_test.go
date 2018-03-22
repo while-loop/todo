@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/while-loop/todo/pkg/publisher/config"
 )
 
 func TestYmlParse(t *testing.T) {
@@ -93,4 +92,4 @@ func cwd(t *testing.T) string {
 	return dir
 }
 
-var tmpConfig = &Config{PublisherConfig: &config.PublisherConfig{Mock: &config.MockConfig{Output: "stderr"}}}
+var tmpConfig = &Config{}

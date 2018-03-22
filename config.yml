@@ -14,7 +14,3 @@ trackers:
     access_token: "my_access_token"
     private_key: "RSA_PRIVATE_KEY"
     issue_number: 8675309
-
-publishers:
-  mock:
-    output: "stdout"

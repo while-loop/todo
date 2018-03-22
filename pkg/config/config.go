@@ -12,7 +12,6 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
-	configp "github.com/while-loop/todo/pkg/publisher/config"
 	configt "github.com/while-loop/todo/pkg/tracker/config"
 	configv "github.com/while-loop/todo/pkg/vcs/config"
 	"gopkg.in/yaml.v2"
@@ -21,7 +20,6 @@ import (
 type Config struct {
 	TrackerConfig   *configt.TrackerConfig   `json:"trackers" yaml:"trackers"`
 	VcsConfig       *configv.VcsConfig       `json:"vcs" yaml:"vcs"`
-	PublisherConfig *configp.PublisherConfig `json:"publishers" yaml:"publishers"`
 }
 
 func ParseFile(filePath string) (*Config, error) {

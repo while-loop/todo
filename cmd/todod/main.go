@@ -40,7 +40,6 @@ func main() {
 
 	log.Info("Repo services ", app.RepoMan.Services())
 	log.Info("Tracker services ", app.TrackerMan.Trackers())
-	log.Info("Publisher services ", app.PublisherMan.Publishers())
 
 	log.Info("Running on " + *laddr)
 	log.Fatal(http.ListenAndServe(*laddr, wrapAppHandler(app)))

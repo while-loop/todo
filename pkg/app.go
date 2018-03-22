@@ -5,7 +5,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/while-loop/todo/pkg/config"
-	"github.com/while-loop/todo/pkg/publisher"
 	"github.com/while-loop/todo/pkg/tracker"
 	"github.com/while-loop/todo/pkg/vcs"
 )
@@ -13,7 +12,6 @@ import (
 type App struct {
 	RepoMan      *vcs.Manager
 	TrackerMan   *tracker.Manager
-	PublisherMan *publisher.Manager
 	Router       *mux.Router
 	Config       *config.Config
 }
@@ -26,7 +24,6 @@ func New(config *config.Config) *App {
 	return &App{
 		RepoMan:      rp,
 		TrackerMan:   tracker.NewManager(config.TrackerConfig, rp.IssueChan()),
-		PublisherMan: publisher.NewManager(config.PublisherConfig),
 		Router:       router,
 		Config:       config,
 	}
