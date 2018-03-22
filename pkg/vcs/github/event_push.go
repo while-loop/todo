@@ -57,7 +57,6 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 		"installation": event.Installation.ID,
 	}
 
-	// todo choose from app installation of oauth
 	itr, err := ghinstallation.New(http.DefaultTransport, s.config.IssueNumber, event.Installation.ID, []byte(s.config.PrivateKey))
 	if err != nil {
 		log.Error(errors.Wrap(err, "failed to create ghinstallation client"))

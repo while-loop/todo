@@ -115,7 +115,6 @@ func (t *tracker) Name() string {
 }
 
 func (t *tracker) client(installationID int) (*github.Client, error) {
-	// todo choose from app installation of oauth
 	itr, err := ghinstallation.New(http.DefaultTransport, t.conf.IssueNumber, installationID, []byte(t.conf.PrivateKey))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get client for tracker")
