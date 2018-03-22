@@ -9,6 +9,7 @@ WORKDIR ${GOPATH}/src/github.com/while-loop/todo
 RUN make all
 
 FROM alpine:latest
+RUN apk add --update --no-cache ca-certificates
 COPY --from=builder /go/bin/todod /usr/local/bin/
 RUN todod -v
 
