@@ -19,20 +19,6 @@ func TestYmlParse(t *testing.T) {
 	a.Equal("my_access_token", conf.VcsConfig.Github.AccessToken)
 }
 
-func TestYamlJsonSame(t *testing.T) {
-	a := require.New(t)
-	ymlConf, err := ParseFile(filepath.Join(cwd(t), "../../", "config.yml"))
-	a.NoError(err)
-
-	jsonConf, err := ParseFile(filepath.Join(cwd(t), "../../", "config.json"))
-	a.NoError(err)
-
-	a.Equal("my_access_token", ymlConf.TrackerConfig.Github.AccessToken)
-	a.Equal("my_access_token", jsonConf.TrackerConfig.Github.AccessToken)
-
-	a.Equal(jsonConf, ymlConf)
-}
-
 func TestFileNotFoundErr(t *testing.T) {
 	a := require.New(t)
 	c, err := ParseFile("fakefile.json")
@@ -50,8 +36,7 @@ func TestFileExts(t *testing.T) {
 		{"test1.toml", true, "unsupported config extension"},
 		{"test1.exe", true, "unsupported config extension"},
 		{"test1", true, "unsupported config extension"},
-		{"test1.JSON", false, ""},
-		{"test1.json", false, ""},
+		{"test1.JSON", true, "unsupported config extension"},
 		{"test1.YML", false, ""},
 		{"test1.yml", false, ""},
 		{"test1.yaml", false, ""},

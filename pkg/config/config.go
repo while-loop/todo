@@ -1,7 +1,6 @@
 package config
 
 import (
-	"encoding/json"
 	"io"
 	"io/ioutil"
 
@@ -30,20 +29,11 @@ func ParseFile(filePath string) (*Config, error) {
 	defer f.Close()
 
 	ext := strings.TrimLeft(strings.ToLower(filepath.Ext(filePath)), ".")
-	if isJson(ext) {
-		return ParseJson(f)
-	} else if isYaml(ext) {
+	if isYaml(ext) {
 		return ParseYaml(f)
 	}
 
 	return nil, fmt.Errorf("unsupported config extension %s", ext)
-}
-
-func ParseJson(reader io.ReadCloser) (*Config, error) {
-	defer reader.Close()
-
-	var c Config
-	return &c, json.NewDecoder(reader).Decode(&c)
 }
 
 func ParseYaml(reader io.ReadCloser) (*Config, error) {
@@ -65,8 +55,4 @@ func ParseYaml(reader io.ReadCloser) (*Config, error) {
 
 func isYaml(ext string) bool {
 	return ext == "yml" || ext == "yaml"
-}
-
-func isJson(ext string) bool {
-	return ext == "json"
 }
