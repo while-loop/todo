@@ -86,3 +86,5 @@ vendor/
 out
 gen
 todo.pem
+deploy
+deployment.zip

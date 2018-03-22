@@ -4,6 +4,7 @@ VERSION     := 0.0.1
 
 ORG         := toyotasupra
 TARGET      := ${SERVICE}d
+LAMBDA_TARGET      := ${SERVICE}-lambda
 COMMIT      := $(shell git rev-parse --short HEAD)
 BUILD_TIME  := $(shell date -u '+%Y-%m-%d_%H:%M:%S')
 IMAGE_NAME  := ${ORG}/${SERVICE}
@@ -25,7 +26,7 @@ build: clean lint ## build service binary file
 		-X ${PACKAGE}/pkg.Commit=${COMMIT} \
 		-X ${PACKAGE}/pkg.BuildTime=${BUILD_TIME}" \
 		-o ${GOPATH}/bin/${TARGET} ./cmd/${TARGET}
-	@todod -v
+	@${TARGET} -v
 
 clean: ## remove service bin from $GOPATH/bin
 	@echo "[clean] removing service files"
@@ -43,6 +44,22 @@ deploy: ## deploy lastest built container to docker hub
 deps: ## get service pkg + test deps
 	@echo "[deps] getting go deps"
 	go get -v -t ./...
+
+lambda: clean lint ## build the lambda binary for todo
+	@echo "[lambda] building go binary"
+	@GOOS=linux go build \
+		-ldflags "-s -w \
+		-X ${PACKAGE}/pkg.Version=${VERSION} \
+		-X ${PACKAGE}/pkg.Commit=${COMMIT} \
+		-X ${PACKAGE}/pkg.BuildTime=${BUILD_TIME}" \
+		-o deploy/${LAMBDA_TARGET} ./cmd/${LAMBDA_TARGET}
+	@deploy/./${LAMBDA_TARGET} version
+	@zip deployment.zip deploy
+
+lambda-deploy: lambda
+	aws lambda update-function-code \
+	--function-name TodoFunction \
+	--zip-file fileb://./deployment.zip
 
 lint: ## apply golint
 	@echo "[lint] applying go fmt & vet"
