@@ -1,8 +1,6 @@
 package vcs
 
 import (
-	"net/http"
-
 	"github.com/gorilla/mux"
 	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/vcs/config"
@@ -11,9 +9,8 @@ import (
 )
 
 type RepositoryService interface {
-	GetRepository(user, project string) error
 	Name() string
-	Handler() http.Handler
+	Init(webhookRouter *mux.Router)
 }
 
 type Manager struct {
@@ -22,7 +19,7 @@ type Manager struct {
 	issueChan chan []*issue.Issue
 }
 
-func NewManager(config *config.VcsConfig) *Manager {
+func NewManager(config *config.VcsConfig, router *mux.Router) *Manager {
 	m := &Manager{
 		config:    config,
 		services:  map[string]RepositoryService{},
@@ -30,6 +27,7 @@ func NewManager(config *config.VcsConfig) *Manager {
 	}
 
 	m.initServices()
+	m.initRouter(router)
 	return m
 }
 
@@ -55,8 +53,14 @@ func (m *Manager) initServices() {
 	}
 }
 
-func (m *Manager) ApplyRouter(router *mux.Router) {
+func (m *Manager) initRouter(router *mux.Router) {
+	hookRoute := router.PathPrefix("/webhook")
+	if hookRoute.GetError() != nil {
+		panic(hookRoute.GetError())
+	}
+
+	hookRouter := hookRoute.Subrouter()
 	for _, srvc := range m.services {
-		router.NewRoute().Handler(srvc.Handler())
+		srvc.Init(hookRouter)
 	}
 }

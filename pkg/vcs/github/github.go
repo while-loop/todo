@@ -48,17 +48,12 @@ func NewService(config *config.GithubConfig, issueChan chan<- []*issue.Issue) *S
 	return s
 }
 
-func (s *Service) GetRepository(user, project string) error {
-	panic("implement me")
-}
-
 func (s *Service) Name() string {
 	return name
 }
 
-func (s *Service) Handler() http.Handler {
-	s.router.HandleFunc("/webhook/"+name, s.webhook).Methods("POST")
-	return s.router
+func (s *Service) Init(webhookRouter *mux.Router) {
+	webhookRouter.HandleFunc("/"+name, s.webhook).Methods("POST")
 }
 
 func (s *Service) webhook(w http.ResponseWriter, r *http.Request) {
