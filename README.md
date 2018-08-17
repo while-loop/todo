@@ -66,11 +66,11 @@ Supported Services
 
 #### Repository Hosting Service
 - Github
-- Gitlab
+- Gitlab (todo)
 
 #### Issue Tracking
 - Github
-- Jira
+- Jira (todo)
 
 #### Publishing Service
 - Email (todo)
