@@ -1,6 +1,6 @@
 # service specific vars
 SERVICE     := todo
-VERSION     := 0.0.1
+VERSION     := 0.0.2
 
 ORG         := toyotasupra
 TARGET      := ${SERVICE}d
@@ -69,3 +69,5 @@ lint: ## apply golint
 test: lint ## test service code
 	@echo "[test] running tests w/ cover"
 	go test ./... -cover
+
+release: clean test build deploy lambda-deploy

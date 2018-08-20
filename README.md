@@ -72,10 +72,6 @@ Supported Services
 - Github
 - Jira (todo)
 
-#### Publishing Service
-- Email (todo)
-- RocketChat (todo)
-
 Determining a Complete TODO
 ---------------------------
 
