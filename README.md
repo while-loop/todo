@@ -15,7 +15,7 @@ software and version control repository hosting service
 Usage
 -----
 
-To use `TODO` in your projects, navigate to the [todo](https://github.com/apps/todobot) app page and allow access to your repos (public/private).
+To use `todo` in your projects, navigate to the [todo](https://github.com/apps/todobot) app page and allow access to your repos (public/private).
 
 For every push to GitHub, `todo` will scan your code and create new issues for your project. Example issues [here](https://github.com/while-loop/todo/issues).
 
