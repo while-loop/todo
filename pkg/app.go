@@ -17,10 +17,11 @@ type App struct {
 }
 
 func New(config *config.Config, router *mux.Router) *App {
-	rp := vcs.NewManager(config.VcsConfig, router)
+	tm := tracker.NewManager(config.TrackerConfig)
+	rp := vcs.NewManager(config.VcsConfig, router, tm)
 	return &App{
 		RepoMan:    rp,
-		TrackerMan: tracker.NewManager(config.TrackerConfig, rp.IssueChan()),
+		TrackerMan: tm,
 		Router:     router,
 		Config:     config,
 	}
@@ -28,8 +29,4 @@ func New(config *config.Config, router *mux.Router) *App {
 
 func (a *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	a.Router.ServeHTTP(w, r)
-}
-
-func (a *App) OnPush() error {
-	return nil
 }

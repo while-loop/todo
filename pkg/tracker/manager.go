@@ -21,53 +21,52 @@ type Tracker interface {
 type Manager struct {
 	trackers map[string]Tracker
 	config   *config.TrackerConfig
-	issueCh  <-chan []*issue.Issue
 }
 
-func NewManager(config *config.TrackerConfig, issueCh <-chan []*issue.Issue) *Manager {
+func NewManager(config *config.TrackerConfig) *Manager {
 	m := &Manager{
 		trackers: map[string]Tracker{},
 		config:   config,
-		issueCh:  issueCh,
 	}
 
 	m.initTrackers()
-	go m.loop()
 	return m
 }
 
-func (m *Manager) loop() {
-	for iss := range m.issueCh {
-		if len(iss) <= 0 {
+func (m *Manager) Create(issues []*issue.Issue) error {
+	if len(issues) < 0 {
+		return nil
+	}
+
+	for _, tr := range m.trackers {
+		tIss, err := tr.GetIssues(context.Background(), issues[0])
+		if err != nil {
+			log.Error(err)
 			continue
 		}
 
-		for _, tr := range m.trackers {
-			tIss, err := tr.GetIssues(context.Background(), iss[0])
-			if err != nil {
-				log.Error(err)
-				continue
-			}
+		toCreate := xorIssues(tIss, issues)
+		log.Info(issues)
+		log.Info(toCreate)
+		log.Infof("need to create %d issues", len(toCreate))
+		var wg sync.WaitGroup
+		for _, cr := range toCreate {
+			wg.Add(1)
+			go func(i *issue.Issue) {
+				log.Info("tocreat: ", i)
+				if is, err := tr.CreateIssue(context.Background(), i); err != nil {
+					log.Error(err)
+				} else {
+					log.Infof("Created issue: %s/%s/%s", is.Owner, is.Repo, is.ID)
+				}
+				wg.Done()
+			}(cr)
 
-			toCreate := xorIssues(tIss, iss)
-			log.Info(iss)
-			log.Info(toCreate)
-			log.Infof("need to create %d issues", len(toCreate))
-			var wg sync.WaitGroup
-			for _, cr := range toCreate {
-				wg.Add(1)
-				go func(i *issue.Issue) {
-					log.Info("tocreat: ", i)
-					if is, err := tr.CreateIssue(context.Background(), i); err != nil {
-						log.Error(err)
-					} else {
-						log.Infof("Created issue: %s/%s/%s", is.Owner, is.Repo, is.ID)
-					}
-					wg.Done()
-				}(cr)
-			}
+			wg.Wait()
 		}
 	}
+
+	return nil
 }
 
 func xorIssues(repoIssues []*issue.Issue, pushIssues []*issue.Issue) []*issue.Issue {

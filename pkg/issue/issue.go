@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 )
 
+type Creator interface {
+	Create([]*Issue) error
+}
+
 type Issue struct {
 	ID          string
 	Title       string
