@@ -67,14 +67,14 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 
 	// send todos to issuechan (tracker will handle reducing and filtering)
 	log.Infof("found %d todos in github push %s", len(todos), event.HeadCommit.URL)
-	go func() {
-		s.issueCh <- todos
-	}()
 
-	// todo(while-loop): change issueChan to an IssueCreator interface to wait for completion
-	// when AWS Lambda exits the http func, all other goroutines are shutdown
-	// this causes the issue creation to be abruptly stopped.. tested with a 2sec timeout
-	w.WriteHeader(http.StatusOK)
+	if err := s.issueCreator.Create(todos); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func contentUrl(owner, repo, sha, path string) string {

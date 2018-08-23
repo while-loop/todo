@@ -14,18 +14,18 @@ const (
 )
 
 type Service struct {
-	router   *mux.Router
-	glClient interface{}
-	issueCh  <-chan []*issue.Issue
+	router       *mux.Router
+	glClient     interface{}
+	issueCreator issue.Creator
 }
 
-func NewService(config *config.GitlabConfig, issueChan <-chan []*issue.Issue) *Service {
+func NewService(config *config.GitlabConfig, issueCreator issue.Creator) *Service {
 	//ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: app.Config.Gitlab.AccessToken})
 	//oauthClient := oauth2.NewClient(context.Background(), ts)
 	s := &Service{
-		issueCh:  issueChan,
-		router:   mux.NewRouter(),
-		glClient: nil,
+		issueCreator: issueCreator,
+		router:       mux.NewRouter(),
+		glClient:     nil,
 	}
 
 	return s

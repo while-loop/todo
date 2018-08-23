@@ -27,15 +27,15 @@ const (
 
 type Service struct {
 	router        *mux.Router
-	issueCh       chan<- []*issue.Issue
 	eventHandlers map[string]http.HandlerFunc
 	config        *config.GithubConfig
 	parser        parser.TodoParser
+	issueCreator  issue.Creator
 }
 
-func NewService(config *config.GithubConfig, issueChan chan<- []*issue.Issue) *Service {
+func NewService(config *config.GithubConfig, creator issue.Creator) *Service {
 	s := &Service{
-		issueCh:       issueChan,
+		issueCreator:  creator,
 		router:        mux.NewRouter(),
 		eventHandlers: map[string]http.HandlerFunc{},
 		config:        config,

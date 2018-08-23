@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"testing"
 
+	"fmt"
 	"github.com/stretchr/testify/require"
 	"github.com/while-loop/todo/pkg/issue"
 )
@@ -71,6 +72,7 @@ func TestTODOs(t *testing.T) {
 		{`	Extras         context.Context // todo change Issue.Extras from Context to map`, slashRegex, nil},
 	}
 
+	fmt.Println(slashRegex)
 	for idx, tc := range tcs {
 		t.Run(strconv.Itoa(idx), func(inner *testing.T) {
 			is, _ := parseLine(tc.rexp, tc.comment)

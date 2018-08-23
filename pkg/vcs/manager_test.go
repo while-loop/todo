@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"github.com/while-loop/todo/pkg/issue"
 	"github.com/while-loop/todo/pkg/vcs/config"
 	"io/ioutil"
 	"net/http"
@@ -12,6 +13,10 @@ import (
 )
 
 type testVCS struct{}
+
+func (t *testVCS) Create([]*issue.Issue) error {
+	panic("implement me")
+}
 
 func (t *testVCS) Name() string {
 	return "testvcs"
@@ -27,7 +32,8 @@ func TestWebHookSubRouter(t *testing.T) {
 	router := mux.NewRouter()
 	man := NewManager(&config.VcsConfig{
 		Github: &config.GithubConfig{},
-	}, router)
+	}, router, &testVCS{})
+
 	man.services["testvcs"] = &testVCS{}
 	man.initRouter(router)
 

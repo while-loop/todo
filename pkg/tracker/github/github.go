@@ -50,6 +50,7 @@ func (t *tracker) GetIssues(ctx context.Context, ref *issue.Issue) ([]*issue.Iss
 
 	gIss, _, err := c.Issues.ListByRepo(ctx, ref.Owner, ref.Repo, &github.IssueListByRepoOptions{
 		ListOptions: github.ListOptions{PerPage: 50},
+		State:       "all",
 	})
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get issues for %s/%s", ref.Owner, ref.Repo)
