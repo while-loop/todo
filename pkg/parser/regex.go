@@ -22,12 +22,13 @@ const (
 )
 
 var (
+	// https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(syntax)#Inline_comments
 	slashRegex    = regexp.MustCompile(strings.Replace(cmtRegex, cmtToken, slash, 1))
 	hashRegex     = regexp.MustCompile(strings.Replace(cmtRegex, cmtToken, hash, 1))
 	mentionsRegex = regexp.MustCompile(`(@[^\s]+)`)
 	labelsRegex   = regexp.MustCompile(`\+([^\s]+)`)
-	slashLangs    = []string{"go", "java", "c", "cpp", "h", "hpp", "test"}
-	hashLangs     = []string{"py", "sh", "bash", "yml", "yaml"}
+	slashLangs    = []string{"go", "java", "c", "cpp", "h", "hpp", "test", "as", "cs", "d", "fs", "js", "kt", "php", "swift", "m", "mm"}
+	hashLangs     = []string{"py", "sh", "bash", "yml", "yaml", "ps", "ps1", "r", "rb", "Makefile", "Dockerfile", "pl"}
 )
 
 func init() {
