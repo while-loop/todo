@@ -7,6 +7,7 @@ import (
 	"github.com/while-loop/todo/pkg/config"
 	"github.com/while-loop/todo/pkg/tracker"
 	"github.com/while-loop/todo/pkg/vcs"
+	"github.com/while-loop/todo/pkg/log"
 )
 
 type App struct {
@@ -16,9 +17,9 @@ type App struct {
 	Config     *config.Config
 }
 
-func New(config *config.Config, router *mux.Router) *App {
-	tm := tracker.NewManager(config.TrackerConfig)
-	rp := vcs.NewManager(config.VcsConfig, router, tm)
+func New(config *config.Config, router *mux.Router, logger log.AnalysisLogger) *App {
+	tm := tracker.NewManager(config.TrackerConfig, logger)
+	rp := vcs.NewManager(config.VcsConfig, router, tm, logger)
 	return &App{
 		RepoMan:    rp,
 		TrackerMan: tm,

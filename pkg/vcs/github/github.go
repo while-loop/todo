@@ -23,6 +23,7 @@ const (
 	issues       = "issues"
 	push         = "push"
 	installation = "installation"
+	installation_repositories = "installation_repositories"
 )
 
 type Service struct {
@@ -31,19 +32,22 @@ type Service struct {
 	config        *config.GithubConfig
 	parser        parser.TodoParser
 	issueCreator  issue.Creator
+	logger        log.AnalysisLogger
 }
 
-func NewService(config *config.GithubConfig, creator issue.Creator) *Service {
+func NewService(config *config.GithubConfig, creator issue.Creator, logger log.AnalysisLogger) *Service {
 	s := &Service{
 		issueCreator:  creator,
 		router:        mux.NewRouter(),
 		eventHandlers: map[string]http.HandlerFunc{},
 		config:        config,
 		parser:        parser.New(), // todo(while-loop) add parser as param
+		logger:        logger,
 	}
 
 	s.eventHandlers[issues] = s.handleIssue
 	s.eventHandlers[installation] = s.handleInstallation
+	s.eventHandlers[installation_repositories] = s.handleRepoInstallation
 	s.eventHandlers[push] = s.handlePush
 	return s
 }

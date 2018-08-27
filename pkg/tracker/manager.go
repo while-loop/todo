@@ -21,12 +21,14 @@ type Tracker interface {
 type Manager struct {
 	trackers map[string]Tracker
 	config   *config.TrackerConfig
+	logger   log.AnalysisLogger
 }
 
-func NewManager(config *config.TrackerConfig) *Manager {
+func NewManager(config *config.TrackerConfig, logger log.AnalysisLogger) *Manager {
 	m := &Manager{
 		trackers: map[string]Tracker{},
 		config:   config,
+		logger:   logger,
 	}
 
 	m.initTrackers()
@@ -54,12 +56,17 @@ func (m *Manager) Create(issues []*issue.Issue) error {
 			wg.Add(1)
 			go func(i *issue.Issue) {
 				log.Info("tocreat: ", i)
-				if is, err := tr.CreateIssue(context.Background(), i); err != nil {
+				defer wg.Done()
+
+				is, err := tr.CreateIssue(context.Background(), i)
+				if err != nil {
 					log.Error(err)
-				} else {
-					log.Infof("Created issue: %s/%s/%s", is.Owner, is.Repo, is.ID)
 				}
-				wg.Done()
+
+				log.Infof("Created issue: %s/%s/%s", is.Owner, is.Repo, is.ID)
+				if err = m.logger.LogIssue(is); err !=nil {
+					log.Error("err logging issue:", err)
+				}
 			}(cr)
 
 			wg.Wait()

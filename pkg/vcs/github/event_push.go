@@ -35,6 +35,11 @@ func (s *Service) handlePush(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Infof("got handlePush: %s", render.Render(event))
+
+	if err := s.logger.LogCommit(event.HeadCommit.Author.Username, event.Repository.Owner.Name, event.Repository.Name, event.HeadCommit.ID); err != nil {
+		log.Error("err logging commit:", err)
+	}
+
 	suspects := make([]string, 0)
 	// get changed files list
 	for _, commit := range event.Commits {
