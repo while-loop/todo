@@ -19,12 +19,14 @@ func TestAWS_Login(t *testing.T) {
 }
 
 func TestPutCommit(t *testing.T) {
+	needsAWS(t)
 	logger, err := newESLogger(testIndex, defUrl)
 	assert.NoError(t, err)
 	assert.NoError(t, logger.LogCommit("help", "me", "pls", "no"))
 }
 
 func TestPutIssue(t *testing.T) {
+	needsAWS(t)
 	logger, err := newESLogger(testIndex, defUrl)
 	assert.NoError(t, err)
 	assert.NoError(t, logger.LogIssue(&issue.Issue{
@@ -34,12 +36,14 @@ func TestPutIssue(t *testing.T) {
 }
 
 func TestPutInstall(t *testing.T) {
+	needsAWS(t)
 	logger, err := newESLogger(testIndex, defUrl)
 	assert.NoError(t, err)
 	assert.NoError(t, logger.LogInstallation("created", "while-loop"))
 }
 
 func TestPutRepoInstall(t *testing.T) {
+	needsAWS(t)
 	logger, err := newESLogger(testIndex, defUrl)
 	assert.NoError(t, err)
 	assert.NoError(t, logger.LogRepoInstallation("created", "while-loop", []string{"myrepo1", "myrepo2"}))
