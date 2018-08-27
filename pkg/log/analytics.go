@@ -1,15 +1,15 @@
 package log
 
 import (
-	"github.com/while-loop/todo/pkg/issue"
-	"github.com/olivere/elastic"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/sha1sum/aws_signing_client"
-	"github.com/aws/aws-sdk-go/aws/signer/v4"
-	"github.com/pkg/errors"
 	"context"
-	"time"
 	"encoding/json"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/aws/signer/v4"
+	"github.com/olivere/elastic"
+	"github.com/pkg/errors"
+	"github.com/sha1sum/aws_signing_client"
+	"github.com/while-loop/todo/pkg/issue"
+	"time"
 )
 
 const (
@@ -69,7 +69,7 @@ func (es *esLogger) LogIssue(issue *issue.Issue) error {
 
 	issueJson["timestamp"] = time.Now()
 	_, err := es.client.Index().
-		Index(es.index+"-issue").
+		Index(es.index + "-issue").
 		Type("issue").
 		BodyJson(issueJson).
 		Do(context.Background())
@@ -83,7 +83,7 @@ func (es *esLogger) LogIssue(issue *issue.Issue) error {
 
 func (es *esLogger) LogCommit(author, owner, repo, commit string) error {
 	_, err := es.client.Index().
-		Index(es.index+"-commit").
+		Index(es.index + "-commit").
 		Type("commit").
 		BodyJson(map[string]interface{}{
 			"author":    author,
@@ -101,7 +101,7 @@ func (es *esLogger) LogCommit(author, owner, repo, commit string) error {
 
 func (es *esLogger) LogInstallation(action, owner string) error {
 	_, err := es.client.Index().
-		Index(es.index+"-installation").
+		Index(es.index + "-installation").
 		Type("installation").
 		BodyJson(map[string]interface{}{
 			"action":    action,
@@ -118,7 +118,7 @@ func (es *esLogger) LogInstallation(action, owner string) error {
 
 func (es *esLogger) LogRepoInstallation(action, owner string, repos []string) error {
 	_, err := es.client.Index().
-		Index(es.index+"-installation_repositories").
+		Index(es.index + "-installation_repositories").
 		Type("installation_repositories").
 		BodyJson(map[string]interface{}{
 			"action":    action,

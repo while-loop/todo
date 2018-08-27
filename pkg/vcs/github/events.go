@@ -34,7 +34,6 @@ func (s *Service) handleInstallation(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 func (s *Service) handleRepoInstallation(w http.ResponseWriter, r *http.Request) {
 	var event github.InstallationRepositoriesEvent
 	if err := json.Unmarshal(r.Context().Value("body").([]byte), &event); err != nil {

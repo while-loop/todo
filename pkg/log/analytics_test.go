@@ -1,10 +1,10 @@
 package log
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/stretchr/testify/assert"
 	"github.com/while-loop/todo/pkg/issue"
+	"testing"
 )
 
 const (

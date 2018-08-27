@@ -32,7 +32,7 @@ func TestWebHookSubRouter(t *testing.T) {
 	router := mux.NewRouter()
 	man := NewManager(&config.VcsConfig{
 		Github: &config.GithubConfig{},
-	}, router, &testVCS{})
+	}, router, &testVCS{}, nil)
 
 	man.services["testvcs"] = &testVCS{}
 	man.initRouter(router)

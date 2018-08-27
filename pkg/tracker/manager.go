@@ -64,7 +64,7 @@ func (m *Manager) Create(issues []*issue.Issue) error {
 				}
 
 				log.Infof("Created issue: %s/%s/%s", is.Owner, is.Repo, is.ID)
-				if err = m.logger.LogIssue(is); err !=nil {
+				if err = m.logger.LogIssue(is); err != nil {
 					log.Error("err logging issue:", err)
 				}
 			}(cr)

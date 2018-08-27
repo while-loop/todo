@@ -5,9 +5,9 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/while-loop/todo/pkg/config"
+	"github.com/while-loop/todo/pkg/log"
 	"github.com/while-loop/todo/pkg/tracker"
 	"github.com/while-loop/todo/pkg/vcs"
-	"github.com/while-loop/todo/pkg/log"
 )
 
 type App struct {

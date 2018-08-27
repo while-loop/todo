@@ -3,10 +3,10 @@ package vcs
 import (
 	"github.com/gorilla/mux"
 	"github.com/while-loop/todo/pkg/issue"
+	"github.com/while-loop/todo/pkg/log"
 	"github.com/while-loop/todo/pkg/vcs/config"
 	"github.com/while-loop/todo/pkg/vcs/github"
 	"github.com/while-loop/todo/pkg/vcs/gitlab"
-	"github.com/while-loop/todo/pkg/log"
 )
 
 type RepositoryService interface {

@@ -19,10 +19,10 @@ import (
 )
 
 const (
-	name         = "github"
-	issues       = "issues"
-	push         = "push"
-	installation = "installation"
+	name                      = "github"
+	issues                    = "issues"
+	push                      = "push"
+	installation              = "installation"
 	installation_repositories = "installation_repositories"
 )
 
