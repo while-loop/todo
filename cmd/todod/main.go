@@ -37,7 +37,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	app := todo.New(conf, mux.NewRouter())
+	app := todo.New(conf, mux.NewRouter(), nil)
 
 	log.Info("Repo services ", app.RepoMan.Services())
 	log.Info("Tracker services ", app.TrackerMan.Trackers())

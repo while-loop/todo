@@ -19,7 +19,7 @@ type Service struct {
 	issueCreator issue.Creator
 }
 
-func NewService(config *config.GitlabConfig, issueCreator issue.Creator) *Service {
+func NewService(config *config.GitlabConfig, issueCreator issue.Creator, logger log.AnalysisLogger) *Service {
 	//ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: app.Config.Gitlab.AccessToken})
 	//oauthClient := oauth2.NewClient(context.Background(), ts)
 	s := &Service{
