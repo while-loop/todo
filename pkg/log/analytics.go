@@ -10,6 +10,7 @@ import (
 	"github.com/sha1sum/aws_signing_client"
 	"github.com/while-loop/todo/pkg/issue"
 	"time"
+	"net/http"
 )
 
 const (
@@ -35,7 +36,9 @@ func NewESLogger(endpoint string) (AnalysisLogger, error) {
 func newESLogger(index, endpoint string) (AnalysisLogger, error) {
 	sesh, err := session.NewSession()
 	signer := v4.NewSigner(sesh.Config.Credentials)
-	awsClient, err := aws_signing_client.New(signer, nil, "es", "us-east-2")
+	awsClient, err := aws_signing_client.New(signer, &http.Client{
+		Timeout: 5 * time.Second,
+	}, "es", "us-east-2")
 	if err != nil {
 		return nil, errors.Wrap(err, "analysis")
 	}
