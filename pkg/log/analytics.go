@@ -9,8 +9,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sha1sum/aws_signing_client"
 	"github.com/while-loop/todo/pkg/issue"
-	"time"
 	"net/http"
+	"time"
 )
 
 const (
