@@ -50,7 +50,15 @@ func TestPutRepoInstall(t *testing.T) {
 }
 
 func needsAWS(t *testing.T) {
-	_, err := session.NewSession()
+	sesh, err := session.NewSession()
+	if err != nil {
+		t.Skip("aws_creds:", err.Error())
+	}
+	if sesh.Config.Credentials == nil {
+		t.Skip("aws_creds are nil")
+	}
+
+	_, err = sesh.Config.Credentials.Get()
 	if err != nil {
 		t.Skip("aws_creds:", err.Error())
 	}
