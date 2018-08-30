@@ -91,6 +91,7 @@ func (es *esLogger) LogCommit(author, owner, repo, commit string) error {
 		BodyJson(map[string]interface{}{
 			"author":    author,
 			"owner":     owner,
+			"repo":      repo,
 			"commit":    commit,
 			"timestamp": time.Now(),
 		}).
